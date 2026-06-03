@@ -1,0 +1,2422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>XTracking v2 | Global Logistics Platform</title>
+
+<!-- Firebase SDK (Compat) -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+<!-- Leaflet.js -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+
+<style>
+/* ============================================================
+   ROOT & RESET
+   ============================================================ */
+:root {
+  --navy:      #0a1628;
+  --navy-mid:  #0f2040;
+  --primary:   #1040a0;
+  --primary-l: #1854c8;
+  --accent:    #f97316;
+  --accent-d:  #ea580c;
+  --gold:      #f4a523;
+  --green:     #22c55e;
+  --red:       #ef4444;
+  --purple:    #8b5cf6;
+  --sky:       #3b82f6;
+  --bg:        #f0f4f8;
+  --surface:   #ffffff;
+  --border:    #dde4ed;
+  --text:      #0a1628;
+  --text-2:    #4a5876;
+  --text-3:    #8a96ae;
+  --shadow-s:  0 2px 8px rgba(10,22,40,.07);
+  --shadow-m:  0 4px 20px rgba(10,22,40,.10);
+  --shadow-l:  0 12px 48px rgba(10,22,40,.14);
+  --r:         14px;
+  --r-s:       8px;
+  --r-xl:      24px;
+  --ease:      .2s ease;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+a { text-decoration: none; }
+button { font-family: inherit; }
+input, select, textarea { font-family: inherit; }
+#app-main { flex: 1; }
+.page { display: none; }
+.page.active { display: block; animation: pageFadeIn .3s ease; }
+
+/* ============================================================
+   NAVIGATION
+   ============================================================ */
+.nav {
+  background: var(--navy);
+  position: sticky; top: 0; z-index: 900;
+  box-shadow: 0 2px 24px rgba(0,0,0,.25);
+}
+.nav-inner {
+  max-width: 1300px; margin: 0 auto; padding: 0 28px;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 66px;
+}
+.nav-brand {
+  display: flex; align-items: center; gap: 10px; cursor: pointer;
+}
+.nav-brand-icon {
+  width: 38px; height: 38px;
+  background: linear-gradient(135deg, var(--accent), var(--gold));
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; color: white;
+  box-shadow: 0 4px 12px rgba(249,115,22,.4);
+}
+.nav-brand-name {
+  font-family: 'Syne', sans-serif;
+  font-size: 21px; font-weight: 800; color: white; letter-spacing: -.5px;
+}
+.nav-brand-name em { color: var(--accent); font-style: normal; }
+.nav-brand-ver {
+  font-size: 10px; font-weight: 600; color: rgba(255,255,255,.4);
+  background: rgba(255,255,255,.08); border-radius: 4px;
+  padding: 2px 6px; margin-left: -4px; align-self: flex-start; margin-top: 4px;
+}
+.nav-links { display: flex; align-items: center; gap: 4px; list-style: none; }
+.nav-links a {
+  display: block; padding: 7px 13px; border-radius: 8px;
+  color: rgba(255,255,255,.72); font-size: 14px; font-weight: 500;
+  cursor: pointer; transition: var(--ease);
+}
+.nav-links a:hover { color: white; background: rgba(255,255,255,.09); }
+.nav-links a.active { color: white; background: rgba(255,255,255,.13); }
+.nav-cta { background: var(--accent) !important; color: white !important; padding: 7px 17px !important; }
+.nav-cta:hover { background: var(--accent-d) !important; }
+.nav-user { display: flex; align-items: center; gap: 10px; }
+.nav-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--accent); color: white;
+  font-size: 13px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+.nav-user-email { color: rgba(255,255,255,.7); font-size: 13px; }
+.burger { display: none; flex-direction: column; gap: 4px; background: none; border: none; cursor: pointer; padding: 4px; }
+.burger span { width: 22px; height: 2px; background: white; border-radius: 2px; transition: var(--ease); display: block; }
+.mob-menu {
+  display: none; position: absolute; top: 66px; left: 0; right: 0;
+  background: var(--navy-mid); border-top: 1px solid rgba(255,255,255,.08);
+  z-index: 899;
+}
+.mob-menu.open { display: block; }
+.mob-menu a {
+  display: block; padding: 14px 28px;
+  color: rgba(255,255,255,.8); font-size: 15px; font-weight: 500;
+  cursor: pointer; transition: var(--ease); border-bottom: 1px solid rgba(255,255,255,.05);
+}
+.mob-menu a:hover { background: rgba(255,255,255,.06); color: white; }
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 7px; padding: 11px 22px; border-radius: var(--r-s);
+  font-size: 14px; font-weight: 600; border: none; cursor: pointer;
+  transition: var(--ease); white-space: nowrap; letter-spacing: .01em;
+}
+.btn:disabled { opacity: .55; cursor: not-allowed; pointer-events: none; }
+.btn-primary   { background: var(--primary); color: white; }
+.btn-primary:hover  { background: var(--primary-l); }
+.btn-accent    { background: var(--accent); color: white; box-shadow: 0 4px 14px rgba(249,115,22,.35); }
+.btn-accent:hover   { background: var(--accent-d); box-shadow: 0 4px 18px rgba(249,115,22,.45); }
+.btn-success   { background: var(--green); color: white; }
+.btn-success:hover  { background: #16a34a; }
+.btn-danger    { background: var(--red); color: white; }
+.btn-danger:hover   { background: #dc2626; }
+.btn-outline   { background: transparent; color: var(--primary); border: 2px solid var(--primary); }
+.btn-outline:hover  { background: var(--primary); color: white; }
+.btn-ghost     { background: transparent; color: var(--text-2); }
+.btn-ghost:hover    { background: var(--border); color: var(--text); }
+.btn-navy      { background: var(--navy); color: white; }
+.btn-navy:hover     { background: var(--navy-mid); }
+.btn-sm  { padding: 7px 14px; font-size: 12px; }
+.btn-lg  { padding: 15px 30px; font-size: 16px; }
+.btn-xl  { padding: 18px 38px; font-size: 17px; border-radius: var(--r); }
+.btn-block { width: 100%; }
+.btn-loading { position: relative; color: transparent !important; pointer-events: none; }
+.btn-loading::after {
+  content: ''; position: absolute;
+  width: 17px; height: 17px;
+  border: 2px solid rgba(255,255,255,.3); border-top-color: white;
+  border-radius: 50%; animation: spin .7s linear infinite;
+}
+
+/* ============================================================
+   CARDS
+   ============================================================ */
+.card {
+  background: var(--surface); border-radius: var(--r);
+  border: 1px solid var(--border); overflow: hidden;
+}
+.card-hd {
+  padding: 18px 22px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.card-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 15px; font-weight: 700; color: var(--text);
+  display: flex; align-items: center; gap: 9px;
+}
+.card-bd { padding: 22px; }
+
+/* ============================================================
+   FORMS
+   ============================================================ */
+.fg { margin-bottom: 18px; }
+.fg:last-child { margin-bottom: 0; }
+.fl {
+  display: block; font-size: 11px; font-weight: 700; letter-spacing: .6px;
+  text-transform: uppercase; color: var(--text-3); margin-bottom: 5px;
+}
+.fi, .fs, .fta {
+  width: 100%; padding: 11px 14px; border: 1.5px solid var(--border);
+  border-radius: var(--r-s); font-size: 14px; color: var(--text);
+  background: var(--surface); outline: none; transition: var(--ease);
+}
+.fi:focus, .fs:focus, .fta:focus {
+  border-color: var(--primary-l); box-shadow: 0 0 0 3px rgba(16,64,160,.08);
+}
+.fi.err, .fs.err { border-color: var(--red); }
+.fta { resize: vertical; min-height: 100px; }
+.f-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.f-sec {
+  font-family: 'Syne', sans-serif;
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .8px; color: var(--primary);
+  padding-bottom: 8px; border-bottom: 2px solid var(--border);
+  margin-bottom: 18px; display: flex; align-items: center; gap: 8px;
+}
+.f-err { color: var(--red); font-size: 12px; margin-top: 4px; display: none; }
+.f-err.show { display: block; }
+.input-wrap { position: relative; }
+.input-icon { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--text-3); font-size: 13px; }
+.input-wrap .fi { padding-left: 38px; }
+
+/* ============================================================
+   STATUS BADGES
+   ============================================================ */
+.badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 10px; border-radius: 100px; font-size: 12px; font-weight: 600;
+}
+.bdot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.b-pending   { background: #f0f0f0; color: #666; }
+.b-transit   { background: #dbeafe; color: #1d4ed8; }
+.b-hub       { background: #ede9fe; color: #7c3aed; }
+.b-delivery  { background: #fff7ed; color: #c2410c; }
+.b-delivered { background: #dcfce7; color: #15803d; }
+.b-hold      { background: #fee2e2; color: #dc2626; }
+
+/* ============================================================
+   MODAL
+   ============================================================ */
+.mo {
+  position: fixed; inset: 0; background: rgba(10,22,40,.55);
+  backdrop-filter: blur(6px); z-index: 9000;
+  display: none; align-items: center; justify-content: center; padding: 20px;
+}
+.mo.show { display: flex; animation: fadeIn .2s ease; }
+.mo-box {
+  background: var(--surface); border-radius: var(--r-xl);
+  width: 100%; max-width: 640px; max-height: 92vh;
+  overflow-y: auto; box-shadow: var(--shadow-l);
+  animation: slideUp .3s ease;
+}
+.mo-hd {
+  padding: 22px 26px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; background: var(--surface); z-index: 1;
+}
+.mo-title { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+.mo-close {
+  width: 34px; height: 34px; border-radius: 8px; border: none;
+  background: var(--bg); cursor: pointer; display: flex; align-items: center; justify-content: center;
+  color: var(--text-3); transition: var(--ease);
+}
+.mo-close:hover { background: var(--border); color: var(--text); }
+.mo-bd { padding: 26px; }
+.mo-ft { padding: 18px 26px; border-top: 1px solid var(--border); display: flex; gap: 10px; justify-content: flex-end; }
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+.toast-wrap { position: fixed; bottom: 22px; right: 22px; z-index: 9999; display: flex; flex-direction: column; gap: 9px; }
+.toast {
+  background: var(--surface); border-radius: 12px; padding: 13px 18px;
+  display: flex; align-items: center; gap: 11px;
+  box-shadow: 0 8px 32px rgba(0,0,0,.14); border-left: 4px solid;
+  min-width: 270px; max-width: 370px; animation: slideRight .3s ease;
+}
+.toast.success { border-left-color: var(--green); }
+.toast.error   { border-left-color: var(--red); }
+.toast.warning { border-left-color: var(--gold); }
+.toast.info    { border-left-color: var(--sky); }
+.toast-icon { font-size: 17px; flex-shrink: 0; }
+.toast.success .toast-icon { color: var(--green); }
+.toast.error   .toast-icon { color: var(--red); }
+.toast.warning .toast-icon { color: var(--gold); }
+.toast.info    .toast-icon { color: var(--sky); }
+.toast-t { font-size: 13px; font-weight: 700; color: var(--text); }
+.toast-m { font-size: 12px; color: var(--text-2); }
+.toast-x { margin-left: auto; background: none; border: none; cursor: pointer; color: var(--text-3); font-size: 13px; padding: 2px; }
+
+/* ============================================================
+   MISC UTILS
+   ============================================================ */
+.spinner { width: 38px; height: 38px; border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin .75s linear infinite; }
+.spinner-sm { width: 18px; height: 18px; border-width: 2px; }
+.divider { border: none; border-top: 1px solid var(--border); margin: 22px 0; }
+.empty { text-align: center; padding: 54px 20px; color: var(--text-2); }
+.empty-icon { font-size: 52px; color: var(--border); margin-bottom: 16px; }
+.empty h3 { font-family: 'Syne', sans-serif; font-size: 18px; color: var(--text); margin-bottom: 6px; }
+.empty p { font-size: 14px; }
+
+/* TABLE */
+.tbl-wrap { overflow-x: auto; border-radius: var(--r); border: 1px solid var(--border); }
+table { width: 100%; border-collapse: collapse; background: var(--surface); }
+thead th {
+  background: var(--bg); padding: 11px 15px; text-align: left;
+  font-size: 11px; font-weight: 700; color: var(--text-3);
+  text-transform: uppercase; letter-spacing: .5px;
+  border-bottom: 1px solid var(--border); white-space: nowrap;
+}
+tbody td { padding: 13px 15px; border-bottom: 1px solid var(--border); font-size: 13px; color: var(--text); vertical-align: middle; }
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover { background: #f7f9fc; }
+.tc-cell { font-family: 'Courier New', monospace; font-weight: 700; color: var(--primary); font-size: 12px; }
+
+/* HOLD BANNER */
+.hold-banner {
+  background: #fff1f2; border: 1px solid #fecdd3; border-radius: var(--r-s);
+  padding: 13px 16px; display: flex; align-items: center; gap: 10px;
+  color: #9f1239; font-size: 13px; font-weight: 500;
+}
+
+/* INFO GROUPS */
+.ig { margin-bottom: 14px; }
+.ig:last-child { margin-bottom: 0; }
+.ig-l { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--text-3); margin-bottom: 2px; }
+.ig-v { font-size: 14px; font-weight: 600; color: var(--text); }
+.ig-sub { font-size: 13px; color: var(--text-2); font-weight: 400; }
+
+/* SECTION SHARED */
+.sec-label {
+  display: inline-block; background: rgba(249,115,22,.1); color: var(--accent);
+  padding: 4px 13px; border-radius: 100px; font-size: 11px; font-weight: 700;
+  letter-spacing: .8px; text-transform: uppercase; margin-bottom: 12px;
+}
+.sec-hd { text-align: center; margin-bottom: 52px; }
+.sec-hd h2 {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(26px, 3vw, 38px); font-weight: 800; letter-spacing: -1px;
+  color: var(--text); margin-bottom: 10px;
+}
+.sec-hd p { font-size: 16px; color: var(--text-2); max-width: 520px; margin: 0 auto; }
+
+/* ============================================================
+   SETUP MODAL (full-screen)
+   ============================================================ */
+#setup-overlay {
+  position: fixed; inset: 0; z-index: 99999;
+  background: rgba(10,22,40,.96);
+  display: none; align-items: center; justify-content: center; padding: 20px;
+}
+#setup-overlay.show { display: flex; }
+.setup-box {
+  background: var(--surface); border-radius: var(--r-xl);
+  width: 100%; max-width: 580px; max-height: 92vh;
+  overflow-y: auto; box-shadow: var(--shadow-l);
+}
+.setup-progress { display: flex; gap: 0; border-radius: 3px; overflow: hidden; margin-bottom: 28px; }
+.sp { flex: 1; height: 4px; background: var(--border); transition: background .3s; }
+.sp.done { background: var(--green); }
+.sp.active { background: var(--primary); }
+.setup-info { background: #dbeafe; border-radius: var(--r-s); padding: 14px 16px; margin-bottom: 22px; }
+.setup-info p { font-size: 13px; color: #1d4ed8; font-weight: 500; }
+.setup-success { background: #dcfce7; border-radius: var(--r-s); padding: 14px 16px; margin-bottom: 22px; }
+.setup-success p { font-size: 13px; color: #15803d; font-weight: 500; }
+
+/* ============================================================
+   HOME PAGE
+   ============================================================ */
+.hero {
+  background: linear-gradient(135deg, var(--navy) 0%, #0d2060 55%, #162578 100%);
+  padding: 110px 28px 100px; text-align: center; position: relative; overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 60% 40%, rgba(249,115,22,.12) 0%, transparent 60%),
+              radial-gradient(ellipse at 20% 80%, rgba(16,64,160,.3) 0%, transparent 50%);
+}
+.hero-grid-bg {
+  position: absolute; inset: 0; opacity: .04;
+  background-image: linear-gradient(rgba(255,255,255,.5) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(255,255,255,.5) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+.hero-content { position: relative; max-width: 720px; margin: 0 auto; }
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: rgba(249,115,22,.15); border: 1px solid rgba(249,115,22,.3);
+  color: #fdba74; padding: 6px 16px; border-radius: 100px;
+  font-size: 12px; font-weight: 600; letter-spacing: .5px; margin-bottom: 26px;
+}
+.hero-badge span { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: pulse-dot 1.5s infinite; }
+.hero h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(38px, 5.5vw, 66px); font-weight: 800;
+  color: white; line-height: 1.08; letter-spacing: -2px; margin-bottom: 22px;
+}
+.hero h1 em { color: var(--accent); font-style: normal; }
+.hero p { font-size: 17px; color: rgba(255,255,255,.68); margin-bottom: 46px; line-height: 1.75; max-width: 540px; margin-left: auto; margin-right: auto; }
+.hero-track {
+  background: white; border-radius: var(--r-xl); padding: 7px;
+  display: flex; gap: 7px; max-width: 560px; margin: 0 auto 18px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.2), 0 0 0 1px rgba(255,255,255,.1);
+}
+.hero-track input {
+  flex: 1; border: none; outline: none; padding: 13px 18px;
+  font-size: 15px; font-family: inherit; color: var(--text);
+  background: transparent;
+}
+.hero-track input::placeholder { color: var(--text-3); }
+.hero-hint { font-size: 12px; color: rgba(255,255,255,.42); }
+.hero-hint i { margin: 0 2px; }
+
+/* FLOATING CARDS decoration */
+.hero-floaters {
+  display: flex; justify-content: center; gap: 14px; margin-top: 56px;
+  flex-wrap: wrap;
+}
+.hero-pill {
+  background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12);
+  border-radius: 100px; padding: 8px 16px;
+  color: rgba(255,255,255,.7); font-size: 12px; font-weight: 500;
+  display: flex; align-items: center; gap: 7px;
+}
+
+/* STATS STRIP */
+.stats-strip { background: var(--navy); padding: 52px 28px; }
+.stats-strip-inner {
+  max-width: 1100px; margin: 0 auto;
+  display: grid; grid-template-columns: repeat(4,1fr); gap: 24px; text-align: center;
+}
+.stat-n {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(36px, 4vw, 52px); font-weight: 800; color: white; line-height: 1;
+}
+.stat-n em { color: var(--accent); font-style: normal; }
+.stat-l { font-size: 13px; color: rgba(255,255,255,.55); margin-top: 6px; font-weight: 500; }
+
+/* FEATURES */
+.features-sec { max-width: 1280px; margin: 0 auto; padding: 88px 28px; }
+.feat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); gap: 22px; }
+.feat-card {
+  background: var(--surface); border-radius: var(--r); padding: 30px;
+  border: 1px solid var(--border); transition: var(--ease);
+  position: relative; overflow: hidden;
+}
+.feat-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--primary));
+  transform: scaleX(0); transform-origin: left; transition: .3s ease;
+}
+.feat-card:hover::before { transform: scaleX(1); }
+.feat-card:hover { box-shadow: var(--shadow-l); transform: translateY(-5px); border-color: transparent; }
+.feat-icon {
+  width: 50px; height: 50px; border-radius: 13px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 21px; margin-bottom: 18px;
+}
+.feat-card h3 { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+.feat-card p { font-size: 14px; color: var(--text-2); line-height: 1.65; }
+
+/* HOME CTA */
+.cta-strip {
+  background: linear-gradient(135deg, var(--primary), var(--navy));
+  padding: 88px 28px; text-align: center;
+}
+.cta-strip h2 {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(28px,3.5vw,46px); font-weight: 800; color: white;
+  letter-spacing: -1.5px; margin-bottom: 14px;
+}
+.cta-strip p { font-size: 17px; color: rgba(255,255,255,.65); margin-bottom: 34px; }
+
+/* ============================================================
+   TRACKING PAGE
+   ============================================================ */
+.track-page { max-width: 920px; margin: 0 auto; padding: 40px 24px 60px; }
+.track-loading { text-align: center; padding: 80px 0; }
+.track-err-page { text-align: center; padding: 80px 0; }
+.track-err-icon { font-size: 72px; color: var(--red); margin-bottom: 20px; }
+.track-err-page h2 { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; margin-bottom: 10px; }
+.track-err-page p { color: var(--text-2); font-size: 15px; margin-bottom: 28px; max-width: 420px; margin-left: auto; margin-right: auto; }
+
+/* Track Header */
+.track-hd {
+  background: linear-gradient(135deg, var(--navy) 0%, var(--primary) 100%);
+  border-radius: var(--r-xl); padding: 30px 34px; margin-bottom: 22px;
+  position: relative; overflow: hidden;
+}
+.track-hd::after {
+  content: '\f48b'; font-family: 'Font Awesome 6 Free'; font-weight: 900;
+  position: absolute; right: 28px; top: 50%; transform: translateY(-50%);
+  font-size: 110px; color: rgba(255,255,255,.05); pointer-events: none;
+}
+.track-code-tag {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: rgba(255,255,255,.12); color: rgba(255,255,255,.85);
+  padding: 4px 12px; border-radius: 6px; font-family: monospace;
+  font-size: 13px; font-weight: 700; margin-bottom: 10px;
+}
+.track-hd h2 { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; color: white; margin-bottom: 5px; }
+.track-hd p { color: rgba(255,255,255,.62); font-size: 14px; margin-bottom: 14px; }
+.track-status-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.cur-loc-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.15);
+  color: rgba(255,255,255,.85); padding: 5px 12px; border-radius: 100px; font-size: 12px; font-weight: 500;
+}
+
+/* ETA Card */
+.eta-card {
+  background: linear-gradient(135deg, var(--navy) 20%, #1040a0 100%);
+  border-radius: var(--r); padding: 28px; color: white;
+  text-align: center; margin-bottom: 22px; overflow: hidden; position: relative;
+}
+.eta-card::before {
+  content: ''; position: absolute; bottom: -30px; right: -30px;
+  width: 140px; height: 140px; background: rgba(255,255,255,.04);
+  border-radius: 50%;
+}
+.eta-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; color: rgba(255,255,255,.55); margin-bottom: 18px; }
+.eta-row { display: flex; align-items: flex-start; justify-content: center; gap: 12px; position: relative; z-index: 1; }
+.eta-unit { text-align: center; }
+.eta-v { font-family: 'Syne', sans-serif; font-size: 46px; font-weight: 800; color: white; display: block; line-height: 1; }
+.eta-u { font-size: 10px; color: rgba(255,255,255,.5); text-transform: uppercase; letter-spacing: .5px; margin-top: 5px; }
+.eta-sep { font-family: 'Syne', sans-serif; font-size: 38px; font-weight: 800; color: rgba(255,255,255,.25); margin-top: 4px; }
+.eta-frozen-pill {
+  background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2);
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 8px 18px; border-radius: 100px;
+  font-size: 13px; color: rgba(255,255,255,.75); margin-top: 12px;
+}
+.eta-bar { background: rgba(255,255,255,.12); border-radius: 100px; height: 5px; margin-top: 22px; overflow: hidden; }
+.eta-bar-fill { height: 100%; border-radius: 100px; background: var(--accent); transition: width 1s linear; }
+.eta-date { font-size: 11px; color: rgba(255,255,255,.38); margin-top: 8px; }
+
+/* Tracking Grid */
+.track-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px; }
+
+/* Map */
+#track-map { height: 320px; border-radius: var(--r); z-index: 1; }
+.map-legend { display: flex; gap: 16px; font-size: 12px; color: var(--text-2); flex-wrap: wrap; }
+.map-legend span { display: flex; align-items: center; gap: 5px; }
+.ldot { width: 9px; height: 9px; border-radius: 50%; }
+
+/* Timeline */
+.timeline { position: relative; padding-left: 28px; }
+.timeline::before { content: ''; position: absolute; left: 11px; top: 8px; bottom: 8px; width: 2px; background: var(--border); }
+.tl-item { position: relative; margin-bottom: 22px; }
+.tl-item:last-child { margin-bottom: 0; }
+.tl-dot {
+  position: absolute; left: -23px; top: 4px;
+  width: 14px; height: 14px; border-radius: 50%;
+  border: 2px solid var(--surface); box-shadow: 0 0 0 2px var(--border);
+}
+.tl-item.current .tl-dot { animation: ring-pulse 2s infinite; }
+.tl-time { font-size: 11px; color: var(--text-3); margin-bottom: 3px; }
+.tl-status { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
+.tl-msg { font-size: 13px; color: var(--text-2); }
+
+/* ============================================================
+   ADMIN AUTH PAGE
+   ============================================================ */
+.auth-wrap { min-height: calc(100vh - 66px); display: flex; align-items: center; justify-content: center; padding: 40px 24px; background: var(--bg); }
+.auth-card { background: var(--surface); border-radius: var(--r-xl); padding: 46px 44px; width: 100%; max-width: 440px; border: 1px solid var(--border); box-shadow: var(--shadow-l); }
+.auth-logo { display: flex; align-items: center; gap: 11px; margin-bottom: 30px; }
+.auth-logo-icon { width: 44px; height: 44px; background: var(--navy); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; }
+.auth-logo-name { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; }
+.auth-logo-name em { color: var(--accent); font-style: normal; }
+.auth-title { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 800; margin-bottom: 6px; }
+.auth-sub { font-size: 14px; color: var(--text-2); margin-bottom: 30px; }
+
+/* ============================================================
+   ADMIN DASHBOARD
+   ============================================================ */
+.admin-layout { display: grid; grid-template-columns: 252px 1fr; min-height: calc(100vh - 66px); }
+.admin-side { background: var(--navy); padding: 24px 0; position: sticky; top: 66px; height: calc(100vh - 66px); overflow-y: auto; }
+.side-nav { list-style: none; padding: 0 10px; }
+.side-nav li { margin-bottom: 3px; }
+.side-nav a {
+  display: flex; align-items: center; gap: 11px; padding: 11px 14px;
+  color: rgba(255,255,255,.6); text-decoration: none; border-radius: 10px;
+  font-size: 14px; font-weight: 500; cursor: pointer; transition: var(--ease);
+}
+.side-nav a:hover { background: rgba(255,255,255,.09); color: rgba(255,255,255,.9); }
+.side-nav a.active { background: var(--accent); color: white !important; }
+.side-sec-l { padding: 16px 24px 5px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,.35); }
+.admin-body { padding: 32px; background: var(--bg); overflow-y: auto; }
+.pg-hd { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; margin-bottom: 30px; flex-wrap: wrap; }
+.pg-title { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 800; letter-spacing: -.5px; }
+.pg-sub { font-size: 13px; color: var(--text-2); margin-top: 3px; }
+.stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(185px,1fr)); gap: 18px; margin-bottom: 28px; }
+.stat-c {
+  background: var(--surface); border-radius: var(--r); padding: 22px;
+  border: 1px solid var(--border); display: flex; align-items: center; gap: 14px;
+}
+.stat-c-icon { width: 46px; height: 46px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.stat-c h3 { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; line-height: 1; }
+.stat-c p { font-size: 12px; color: var(--text-3); margin-top: 2px; font-weight: 500; }
+
+/* SEARCH BAR */
+.search-row { display: flex; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; }
+.search-row .fi { flex: 1; min-width: 200px; }
+
+/* TABS */
+.tabs { display: flex; border-bottom: 2px solid var(--border); margin-bottom: 22px; }
+.tab-btn {
+  padding: 9px 18px; border: none; background: none; font-family: inherit;
+  font-size: 14px; font-weight: 600; color: var(--text-2); cursor: pointer;
+  border-bottom: 2px solid transparent; margin-bottom: -2px; transition: var(--ease);
+}
+.tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+.tab-btn:hover { color: var(--primary); }
+
+/* ============================================================
+   ABOUT PAGE
+   ============================================================ */
+.about-hero {
+  background: linear-gradient(135deg, var(--navy) 0%, #0f2060 100%);
+  padding: 88px 28px; text-align: center; color: white;
+}
+.about-hero h1 { font-family: 'Syne', sans-serif; font-size: clamp(34px, 4.5vw, 58px); font-weight: 800; letter-spacing: -2px; margin-bottom: 14px; }
+.about-hero p { font-size: 17px; color: rgba(255,255,255,.68); max-width: 520px; margin: 0 auto; }
+.content-wrap { max-width: 1240px; margin: 0 auto; padding: 80px 28px; }
+.story-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; margin-bottom: 80px; }
+.story-img-box {
+  background: linear-gradient(135deg, var(--primary), var(--navy));
+  border-radius: var(--r-xl); padding: 52px; color: white; text-align: center;
+}
+.story-img-box h3 { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; margin-bottom: 10px; }
+.story-img-box p { font-size: 14px; color: rgba(255,255,255,.7); line-height: 1.7; }
+.team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 20px; }
+.team-card { background: var(--surface); border-radius: var(--r); padding: 28px 22px; text-align: center; border: 1px solid var(--border); transition: var(--ease); }
+.team-card:hover { box-shadow: var(--shadow-m); transform: translateY(-4px); }
+.team-av { width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 14px; display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; color: white; }
+.team-n { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; }
+.team-r { font-size: 13px; color: var(--text-2); margin-top: 3px; }
+.values-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px,1fr)); gap: 20px; margin-bottom: 80px; }
+.val-card { background: var(--surface); border-radius: var(--r); padding: 28px; border: 1px solid var(--border); }
+.val-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 16px; }
+.val-card h3 { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 7px; }
+.val-card p { font-size: 13px; color: var(--text-2); line-height: 1.65; }
+
+/* ============================================================
+   SERVICES PAGE
+   ============================================================ */
+.services-hero {
+  background: linear-gradient(135deg, #0a1628 0%, var(--primary) 100%);
+  padding: 88px 28px; text-align: center; color: white;
+}
+.services-hero h1 { font-family: 'Syne', sans-serif; font-size: clamp(34px, 4.5vw, 58px); font-weight: 800; letter-spacing: -2px; margin-bottom: 14px; }
+.services-hero p { font-size: 17px; color: rgba(255,255,255,.65); max-width: 520px; margin: 0 auto; }
+.services-content { max-width: 1240px; margin: 0 auto; padding: 80px 28px; }
+.srv-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px,1fr)); gap: 22px; margin-bottom: 64px; }
+.srv-card {
+  background: var(--surface); border-radius: var(--r); padding: 34px 28px;
+  border: 1px solid var(--border); transition: var(--ease); position: relative; overflow: hidden;
+}
+.srv-card:hover { box-shadow: var(--shadow-l); transform: translateY(-5px); }
+.srv-icon { width: 58px; height: 58px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 18px; }
+.srv-card h3 { font-family: 'Syne', sans-serif; font-size: 19px; font-weight: 700; margin-bottom: 9px; }
+.srv-card p { font-size: 14px; color: var(--text-2); line-height: 1.65; }
+.srv-tag { margin-top: 16px; display: flex; gap: 6px; flex-wrap: wrap; }
+.srv-tag span { background: var(--bg); color: var(--text-2); font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 100px; border: 1px solid var(--border); }
+.pricing-cta { background: linear-gradient(135deg, var(--navy), var(--primary)); border-radius: var(--r-xl); padding: 60px; text-align: center; }
+.pricing-cta h2 { font-family: 'Syne', sans-serif; font-size: clamp(26px,3vw,40px); font-weight: 800; color: white; letter-spacing: -1px; margin-bottom: 12px; }
+.pricing-cta p { font-size: 16px; color: rgba(255,255,255,.65); max-width: 480px; margin: 0 auto 28px; }
+.process-sec { margin-bottom: 80px; }
+.process-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 20px; position: relative; }
+.proc-step { background: var(--surface); border-radius: var(--r); padding: 28px 22px; border: 1px solid var(--border); text-align: center; }
+.proc-num { font-family: 'Syne', sans-serif; font-size: 36px; font-weight: 800; color: var(--border); line-height: 1; margin-bottom: 10px; }
+.proc-step h4 { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+.proc-step p { font-size: 13px; color: var(--text-2); line-height: 1.6; }
+
+/* ============================================================
+   CONTACT PAGE
+   ============================================================ */
+.contact-hero {
+  background: linear-gradient(135deg, var(--navy) 0%, #0f2060 100%);
+  padding: 88px 28px; text-align: center; color: white;
+}
+.contact-hero h1 { font-family: 'Syne', sans-serif; font-size: clamp(34px, 4.5vw, 58px); font-weight: 800; letter-spacing: -2px; margin-bottom: 14px; }
+.contact-hero p { font-size: 17px; color: rgba(255,255,255,.68); max-width: 520px; margin: 0 auto; }
+.contact-wrap { max-width: 1100px; margin: 0 auto; padding: 72px 28px; }
+.contact-layout { display: grid; grid-template-columns: 1fr 1.6fr; gap: 44px; }
+.ci-item { display: flex; align-items: flex-start; gap: 15px; margin-bottom: 26px; }
+.ci-icon { width: 42px; height: 42px; background: rgba(16,64,160,.08); border-radius: 11px; display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 16px; flex-shrink: 0; }
+.ci-text h4 { font-size: 14px; font-weight: 700; margin-bottom: 3px; }
+.ci-text p { font-size: 13px; color: var(--text-2); line-height: 1.6; }
+.emerg-box { background: var(--bg); border-radius: var(--r); padding: 22px; border: 1px solid var(--border); margin-top: 28px; }
+.emerg-box h4 { font-family: 'Syne', sans-serif; font-weight: 700; margin-bottom: 6px; }
+.emerg-box p { font-size: 13px; color: var(--text-2); margin-bottom: 10px; }
+.emerg-num { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; color: var(--primary); }
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+footer { background: var(--navy); color: rgba(255,255,255,.6); padding: 60px 28px 24px; }
+.footer-grid { max-width: 1240px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 48px; }
+.ft-brand h3 { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; color: white; margin-bottom: 10px; }
+.ft-brand h3 em { color: var(--accent); font-style: normal; }
+.ft-brand p { font-size: 13px; line-height: 1.7; max-width: 260px; }
+.ft-col h4 { font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; color: white; margin-bottom: 14px; }
+.ft-col ul { list-style: none; }
+.ft-col ul li { margin-bottom: 8px; }
+.ft-col ul li a { font-size: 13px; color: rgba(255,255,255,.55); cursor: pointer; transition: var(--ease); }
+.ft-col ul li a:hover { color: white; }
+.ft-bottom { max-width: 1240px; margin: 0 auto; padding-top: 20px; border-top: 1px solid rgba(255,255,255,.08); display: flex; align-items: center; justify-content: space-between; font-size: 12px; flex-wrap: wrap; gap: 8px; }
+
+/* ============================================================
+   ANIMATIONS
+   ============================================================ */
+@keyframes spin         { to { transform: rotate(360deg); } }
+@keyframes fadeIn       { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp      { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideRight   { from { opacity: 0; transform: translateX(28px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes pageFadeIn   { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes pulse-dot    { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
+@keyframes ring-pulse   { 0%,100% { box-shadow: 0 0 0 3px var(--primary-l); } 50% { box-shadow: 0 0 0 7px rgba(16,64,160,.15); } }
+@keyframes float        { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 1024px) {
+  .admin-layout { grid-template-columns: 1fr; }
+  .admin-side { position: static; height: auto; padding: 10px 0; }
+  .side-nav { display: flex; padding: 0 10px; overflow-x: auto; gap: 4px; }
+  .side-nav li { margin-bottom: 0; white-space: nowrap; }
+  .side-sec-l { display: none; }
+  .footer-grid { grid-template-columns: 1fr 1fr; }
+  .story-grid { grid-template-columns: 1fr; gap: 32px; }
+  .contact-layout { grid-template-columns: 1fr; }
+}
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .burger { display: flex; }
+  .nav-user .nav-user-email { display: none; }
+  .track-grid { grid-template-columns: 1fr; }
+  .f-row { grid-template-columns: 1fr; }
+  .stats-strip-inner { grid-template-columns: repeat(2,1fr); }
+  .footer-grid { grid-template-columns: 1fr; }
+  .ft-bottom { flex-direction: column; text-align: center; }
+  .auth-card { padding: 30px 22px; }
+  .admin-body { padding: 20px; }
+  .hero-floaters { display: none; }
+}
+@media (max-width: 480px) {
+  .stats-strip-inner { grid-template-columns: 1fr; }
+  .eta-v { font-size: 34px; }
+  .hero h1 { font-size: 34px; }
+  .contact-layout { gap: 24px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ====================================================
+     SETUP OVERLAY
+     ==================================================== -->
+<div id="setup-overlay">
+  <div class="setup-box">
+    <div class="mo-hd">
+      <div class="mo-title">
+        <div style="width:32px;height:32px;background:var(--navy);border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-size:15px;">
+          <i class="fa-solid fa-truck-fast"></i>
+        </div>
+        XTracking v2 — Firebase Setup
+      </div>
+    </div>
+    <div class="mo-bd">
+      <!-- Step 1: Firebase Config -->
+      <div id="setup-s1">
+        <div class="setup-progress"><div class="sp active"></div><div class="sp"></div></div>
+        <div class="setup-info">
+          <p><i class="fa-solid fa-circle-info"></i> &nbsp;Go to <strong>Firebase Console → Project Settings → Your Apps</strong> and copy your config below.</p>
+        </div>
+        <div class="f-row">
+          <div class="fg"><label class="fl">API Key *</label><input id="fb-key" class="fi" placeholder="AIzaSy..."/></div>
+          <div class="fg"><label class="fl">Auth Domain *</label><input id="fb-auth" class="fi" placeholder="project.firebaseapp.com"/></div>
+        </div>
+        <div class="f-row">
+          <div class="fg"><label class="fl">Project ID *</label><input id="fb-proj" class="fi" placeholder="my-project"/></div>
+          <div class="fg"><label class="fl">Storage Bucket</label><input id="fb-store" class="fi" placeholder="project.appspot.com"/></div>
+        </div>
+        <div class="f-row">
+          <div class="fg"><label class="fl">Messaging Sender ID</label><input id="fb-msg" class="fi" placeholder="123456789"/></div>
+          <div class="fg"><label class="fl">App ID *</label><input id="fb-app" class="fi" placeholder="1:xxx:web:xxx"/></div>
+        </div>
+        <div id="setup-err1" style="color:var(--red);font-size:13px;margin-top:-4px;display:none;padding:10px 14px;background:#fee2e2;border-radius:8px;"></div>
+      </div>
+      <!-- Step 2: Admin Account -->
+      <div id="setup-s2" style="display:none;">
+        <div class="setup-progress"><div class="sp done"></div><div class="sp active"></div></div>
+        <div class="setup-success"><p><i class="fa-solid fa-check-circle"></i> &nbsp;Firebase connected! Now create your admin account.</p></div>
+        <div class="fg"><label class="fl">Admin Email *</label><input type="email" id="admin-em" class="fi" placeholder="admin@company.com"/></div>
+        <div class="fg"><label class="fl">Password (min 6 chars) *</label><input type="password" id="admin-pw" class="fi" placeholder="••••••••"/></div>
+        <div class="fg"><label class="fl">Confirm Password *</label><input type="password" id="admin-pw2" class="fi" placeholder="••••••••"/></div>
+        <div id="setup-err2" style="color:var(--red);font-size:13px;margin-top:-4px;display:none;padding:10px 14px;background:#fee2e2;border-radius:8px;"></div>
+        <p style="font-size:12px;color:var(--text-3);margin-top:8px;">Add more admin accounts later via Firebase Console → Authentication.</p>
+      </div>
+    </div>
+    <div class="mo-ft" style="justify-content:space-between;">
+      <button id="setup-demo-btn" class="btn btn-ghost"><i class="fa-solid fa-flask"></i> Use Demo Mode</button>
+      <button id="setup-next-btn" class="btn btn-primary">Connect Firebase <i class="fa-solid fa-arrow-right"></i></button>
+    </div>
+  </div>
+</div>
+
+<!-- ====================================================
+     NAVIGATION
+     ==================================================== -->
+<nav class="nav" style="position:relative;">
+  <div class="nav-inner">
+    <div class="nav-brand" onclick="go('home')">
+      <div class="nav-brand-icon"><i class="fa-solid fa-truck-fast"></i></div>
+      <span class="nav-brand-name">X<em>Tracking</em></span>
+      <span class="nav-brand-ver">v2</span>
+    </div>
+    <ul class="nav-links" id="nav-links">
+      <li><a data-page="home"      onclick="go('home')">Home</a></li>
+      <li><a data-page="about"     onclick="go('about')">About</a></li>
+      <li><a data-page="services"  onclick="go('services')">Services</a></li>
+      <li><a data-page="contact"   onclick="go('contact')">Contact</a></li>
+      <li id="nl-admin" style="display:none;"><a data-page="admin" onclick="go('admin')">Dashboard</a></li>
+      <li id="nl-login"><a onclick="go('login')">Admin Login</a></li>
+      <li><a class="nav-cta" onclick="go('home');setTimeout(()=>document.getElementById('hero-inp').focus(),300)">Track Package</a></li>
+    </ul>
+    <div id="nav-user" class="nav-user" style="display:none;">
+      <div class="nav-avatar" id="nav-av">A</div>
+      <span class="nav-user-email" id="nav-uem"></span>
+      <button onclick="doSignOut()" class="btn btn-ghost btn-sm" style="color:rgba(255,255,255,.6);">
+        <i class="fa-solid fa-sign-out-alt"></i>
+      </button>
+    </div>
+    <button class="burger" onclick="toggleMob()" id="burger-btn">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="mob-menu" id="mob-menu">
+    <a onclick="go('home');closeMob()">Home</a>
+    <a onclick="go('about');closeMob()">About</a>
+    <a onclick="go('services');closeMob()">Services</a>
+    <a onclick="go('contact');closeMob()">Contact</a>
+    <a onclick="go('login');closeMob()" id="mob-login">Admin Login</a>
+    <a onclick="go('admin');closeMob()" id="mob-admin" style="display:none;">Dashboard</a>
+    <a onclick="doSignOut();closeMob()" id="mob-logout" style="display:none;">Sign Out</a>
+  </div>
+</nav>
+
+<!-- ====================================================
+     MAIN CONTENT
+     ==================================================== -->
+<main id="app-main">
+
+<!-- ═══ HOME PAGE ═══ -->
+<div id="pg-home" class="page">
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-grid-bg"></div>
+    <div class="hero-content">
+      <div class="hero-badge"><span></span> Live Tracking Platform &nbsp;·&nbsp; Firebase Powered</div>
+      <h1>Track Every Package,<br><em>Everywhere.</em></h1>
+      <p>Enterprise-grade shipment management with real-time GPS simulation, smart ETA engine, and full lifecycle control.</p>
+      <div class="hero-track">
+        <i class="fa-solid fa-barcode" style="color:var(--text-3);padding:0 4px 0 14px;font-size:17px;"></i>
+        <input id="hero-inp" type="text" placeholder="Enter tracking code  (e.g. XTR-DEMO01)" maxlength="20" autocomplete="off"/>
+        <button class="btn btn-accent" onclick="trackFromHero()">Track Now</button>
+      </div>
+      <p class="hero-hint">
+        <i class="fa-solid fa-lock"></i> Secure &nbsp;·&nbsp;
+        <i class="fa-solid fa-satellite-dish"></i> Real-Time &nbsp;·&nbsp;
+        <i class="fa-solid fa-globe"></i> Global Coverage
+      </p>
+      <div class="hero-floaters">
+        <div class="hero-pill"><i class="fa-solid fa-check-circle" style="color:#22c55e;"></i> 98% On-Time</div>
+        <div class="hero-pill"><i class="fa-solid fa-boxes-stacked" style="color:var(--accent);"></i> 12M+ Packages</div>
+        <div class="hero-pill"><i class="fa-solid fa-map-pin" style="color:#8b5cf6;"></i> 150+ Countries</div>
+        <div class="hero-pill"><i class="fa-solid fa-headset" style="color:#3b82f6;"></i> 24/7 Support</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <div class="stats-strip">
+    <div class="stats-strip-inner">
+      <div><div class="stat-n">12<em>M+</em></div><div class="stat-l">Packages Delivered</div></div>
+      <div><div class="stat-n">98<em>%</em></div><div class="stat-l">On-Time Rate</div></div>
+      <div><div class="stat-n">150<em>+</em></div><div class="stat-l">Countries Served</div></div>
+      <div><div class="stat-n">24<em>/7</em></div><div class="stat-l">Live Support</div></div>
+    </div>
+  </div>
+
+  <!-- Features -->
+  <section class="features-sec">
+    <div class="sec-hd">
+      <div class="sec-label">Why XTracking</div>
+      <h2>Built for Modern Logistics</h2>
+      <p>Everything you need to manage, track, and deliver with total confidence and transparency.</p>
+    </div>
+    <div class="feat-grid">
+      <div class="feat-card">
+        <div class="feat-icon" style="background:#dbeafe;color:#1d4ed8;"><i class="fa-solid fa-location-dot"></i></div>
+        <h3>Real-Time Tracking</h3>
+        <p>Live GPS-simulated position updates with smooth animated map visualization. See exactly where your shipment is, every second.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon" style="background:#dcfce7;color:#15803d;"><i class="fa-solid fa-clock-rotate-left"></i></div>
+        <h3>Smart ETA Engine</h3>
+        <p>Intelligent live countdown with hold/resume support. ETA freezes when on hold and recalculates instantly on resume.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon" style="background:#fff7ed;color:#c2410c;"><i class="fa-solid fa-timeline"></i></div>
+        <h3>Status Timeline</h3>
+        <p>Complete visual history of every update with timestamps — from pickup to final delivery, nothing is hidden.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon" style="background:#ede9fe;color:#7c3aed;"><i class="fa-solid fa-shield-halved"></i></div>
+        <h3>Secure Admin Panel</h3>
+        <p>Firebase-authenticated dashboard with full CRUD control, hold/resume management, and per-shipment status control.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon" style="background:#fdf4ff;color:#a21caf;"><i class="fa-solid fa-map"></i></div>
+        <h3>Interactive Maps</h3>
+        <p>Leaflet.js maps with origin, destination, and animated current-position markers. Route line shows entire journey.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon" style="background:#f0fdf4;color:#15803d;"><i class="fa-solid fa-database"></i></div>
+        <h3>Cloud Persistence</h3>
+        <p>All data stored in Firebase Firestore. Shipments sync instantly across sessions, devices, and admin accounts.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <div class="cta-strip">
+    <h2>Ready to Ship Smarter?</h2>
+    <p>Join thousands of businesses that trust XTracking for mission-critical logistics.</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-accent btn-xl" onclick="go('contact')">Get Started Today</button>
+      <button class="btn btn-xl" style="background:rgba(255,255,255,.1);color:white;border:1px solid rgba(255,255,255,.2);" onclick="go('services')">View Services</button>
+    </div>
+  </div>
+</div><!-- end home -->
+
+<!-- ═══ TRACKING RESULT PAGE ═══ -->
+<div id="pg-track" class="page">
+  <div class="track-page">
+    <!-- Loading -->
+    <div id="tr-loading" class="track-loading">
+      <div class="spinner" style="margin:0 auto 18px;"></div>
+      <p style="color:var(--text-2);font-size:15px;">Fetching shipment data…</p>
+    </div>
+    <!-- Error -->
+    <div id="tr-error" style="display:none;" class="track-err-page">
+      <div class="track-err-icon"><i class="fa-solid fa-circle-exclamation"></i></div>
+      <h2>Shipment Not Found</h2>
+      <p>The tracking code you entered doesn't match any shipment. Please double-check and try again.</p>
+      <button class="btn btn-primary btn-lg" onclick="go('home')"><i class="fa-solid fa-arrow-left"></i> Try Again</button>
+    </div>
+    <!-- Content -->
+    <div id="tr-content" style="display:none;">
+      <!-- Track Header -->
+      <div class="track-hd">
+        <div class="track-code-tag" id="tc-code"><i class="fa-solid fa-barcode"></i> <span id="tc-code-txt"></span></div>
+        <h2 id="tc-pkg"></h2>
+        <p id="tc-route"></p>
+        <div class="track-status-row">
+          <span id="tc-status"></span>
+          <span class="cur-loc-pill" id="tc-loc-pill" style="display:none;"><i class="fa-solid fa-location-dot"></i> <span id="tc-loc-txt"></span></span>
+        </div>
+      </div>
+      <!-- Hold Banner -->
+      <div id="hold-banner" class="hold-banner" style="display:none;margin-bottom:18px;">
+        <i class="fa-solid fa-circle-pause fa-lg"></i>
+        <div><strong>Shipment On Hold:</strong> <span id="hold-reason"></span></div>
+      </div>
+      <!-- ETA -->
+      <div class="eta-card" id="eta-card">
+        <div class="eta-label"><i class="fa-regular fa-clock"></i> &nbsp; Estimated Delivery Countdown</div>
+        <div class="eta-row" id="eta-row">
+          <div class="eta-unit"><span class="eta-v" id="ed">00</span><div class="eta-u">Days</div></div>
+          <span class="eta-sep">:</span>
+          <div class="eta-unit"><span class="eta-v" id="eh">00</span><div class="eta-u">Hours</div></div>
+          <span class="eta-sep">:</span>
+          <div class="eta-unit"><span class="eta-v" id="em">00</span><div class="eta-u">Mins</div></div>
+          <span class="eta-sep">:</span>
+          <div class="eta-unit"><span class="eta-v" id="es">00</span><div class="eta-u">Secs</div></div>
+        </div>
+        <div id="eta-frozen" class="eta-frozen-pill" style="display:none;"><i class="fa-solid fa-snowflake"></i> ETA Frozen — Shipment On Hold</div>
+        <div class="eta-bar"><div class="eta-bar-fill" id="eta-prog" style="width:0%"></div></div>
+        <div class="eta-date" id="eta-dt"></div>
+      </div>
+      <!-- Sender / Receiver -->
+      <div class="track-grid">
+        <div class="card">
+          <div class="card-hd"><div class="card-title"><i class="fa-solid fa-box" style="color:var(--accent);"></i> Sender</div></div>
+          <div class="card-bd">
+            <div class="ig"><div class="ig-l">Name</div><div class="ig-v" id="tc-sn"></div></div>
+            <div class="ig"><div class="ig-l">Address</div><div class="ig-v" id="tc-sa"></div></div>
+            <div class="ig"><div class="ig-l">Phone</div><div class="ig-v" id="tc-sp"></div></div>
+            <div class="ig" style="margin-bottom:0"><div class="ig-l">Email</div><div class="ig-v" id="tc-se"></div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-hd"><div class="card-title"><i class="fa-solid fa-house" style="color:var(--green);"></i> Receiver</div></div>
+          <div class="card-bd">
+            <div class="ig"><div class="ig-l">Name</div><div class="ig-v" id="tc-rn"></div></div>
+            <div class="ig"><div class="ig-l">Address</div><div class="ig-v" id="tc-ra"></div></div>
+            <div class="ig"><div class="ig-l">Phone</div><div class="ig-v" id="tc-rp"></div></div>
+            <div class="ig" style="margin-bottom:0"><div class="ig-l">Email</div><div class="ig-v" id="tc-re"></div></div>
+          </div>
+        </div>
+      </div>
+      <!-- Map -->
+      <div class="card" style="margin-bottom:18px;">
+        <div class="card-hd">
+          <div class="card-title"><i class="fa-solid fa-map" style="color:var(--sky);"></i> Live Route Map</div>
+          <div class="map-legend">
+            <span><div class="ldot" style="background:#22c55e;"></div> Origin</span>
+            <span><div class="ldot" style="background:#ef4444;"></div> Destination</span>
+            <span><div class="ldot" style="background:#3b82f6;"></div> Current</span>
+          </div>
+        </div>
+        <div id="track-map"></div>
+      </div>
+      <!-- Timeline -->
+      <div class="card">
+        <div class="card-hd"><div class="card-title"><i class="fa-solid fa-list-check" style="color:var(--purple);"></i> Shipment Timeline</div></div>
+        <div class="card-bd"><div class="timeline" id="tc-timeline"></div></div>
+      </div>
+      <div style="text-align:center;margin-top:30px;">
+        <button class="btn btn-outline" onclick="go('home')"><i class="fa-solid fa-magnifying-glass"></i> Track Another Package</button>
+      </div>
+    </div>
+  </div>
+</div><!-- end track -->
+
+<!-- ═══ ADMIN LOGIN ═══ -->
+<div id="pg-login" class="page">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <div class="auth-logo-icon"><i class="fa-solid fa-truck-fast"></i></div>
+        <div class="auth-logo-name">X<em>Tracking</em></div>
+      </div>
+      <div class="auth-title">Admin Login</div>
+      <div class="auth-sub">Sign in to access the logistics dashboard</div>
+      <div class="fg">
+        <label class="fl">Email Address</label>
+        <div class="input-wrap">
+          <i class="fa-solid fa-envelope input-icon"></i>
+          <input type="email" id="l-email" class="fi" placeholder="admin@company.com" autocomplete="email"/>
+        </div>
+      </div>
+      <div class="fg">
+        <label class="fl">Password</label>
+        <div class="input-wrap">
+          <i class="fa-solid fa-lock input-icon"></i>
+          <input type="password" id="l-pass" class="fi" placeholder="Enter password" autocomplete="current-password"/>
+        </div>
+      </div>
+      <div id="l-err" style="color:var(--red);font-size:13px;min-height:20px;margin-bottom:14px;"></div>
+      <button class="btn btn-primary btn-block" id="l-btn" onclick="doLogin()"><i class="fa-solid fa-sign-in-alt"></i> Sign In</button>
+      <!-- Demo credentials hint (hidden in Firebase mode) -->
+      <div id="demo-hint" style="margin-top:18px;background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:13px 15px;">
+        <p style="font-size:12px;font-weight:700;color:#c2410c;margin-bottom:4px;"><i class="fa-solid fa-flask"></i> Demo Mode Credentials</p>
+        <p style="font-size:12px;color:#9a3412;">Email: <code style="background:#fee2e2;padding:2px 6px;border-radius:4px;">admin@demo.com</code></p>
+        <p style="font-size:12px;color:#9a3412;margin-top:3px;">Password: <code style="background:#fee2e2;padding:2px 6px;border-radius:4px;">demo1234</code></p>
+      </div>
+      <hr class="divider"/>
+      <p style="font-size:13px;color:var(--text-2);text-align:center;">
+        No Firebase setup yet?
+        <a onclick="showSetup()" style="color:var(--primary);font-weight:700;cursor:pointer;">Configure Firebase</a>
+      </p>
+    </div>
+  </div>
+</div><!-- end login -->
+
+<!-- ═══ ADMIN DASHBOARD ═══ -->
+<div id="pg-admin" class="page">
+  <div class="admin-layout">
+    <!-- Sidebar -->
+    <aside class="admin-side">
+      <div class="side-sec-l">Management</div>
+      <ul class="side-nav">
+        <li><a onclick="showTab('overview')" id="tab-overview" class="active"><i class="fa-solid fa-chart-pie"></i> Overview</a></li>
+        <li><a onclick="showTab('shipments')" id="tab-shipments"><i class="fa-solid fa-boxes-stacked"></i> Shipments</a></li>
+        <li><a onclick="showTab('create')" id="tab-create"><i class="fa-solid fa-plus-circle"></i> New Shipment</a></li>
+      </ul>
+      <div class="side-sec-l" style="margin-top:20px;">System</div>
+      <ul class="side-nav">
+        <li><a onclick="go('home')"><i class="fa-solid fa-globe"></i> Public Site</a></li>
+        <li><a onclick="doSignOut()"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a></li>
+      </ul>
+    </aside>
+    <!-- Body -->
+    <div class="admin-body">
+
+      <!-- OVERVIEW TAB -->
+      <div id="atab-overview">
+        <div class="pg-hd">
+          <div><div class="pg-title">Dashboard Overview</div><div class="pg-sub">Monitor all shipments and logistics activity</div></div>
+          <button class="btn btn-accent" onclick="showTab('create')"><i class="fa-solid fa-plus"></i> New Shipment</button>
+        </div>
+        <div class="stats-row" id="admin-stats"></div>
+        <div class="card">
+          <div class="card-hd">
+            <div class="card-title"><i class="fa-solid fa-clock-rotate-left"></i> Recent Shipments</div>
+            <button class="btn btn-ghost btn-sm" onclick="showTab('shipments')">View All →</button>
+          </div>
+          <div class="tbl-wrap" style="border:none;border-radius:0;">
+            <table>
+              <thead><tr><th>Code</th><th>Receiver</th><th>Status</th><th>ETA</th><th>Actions</th></tr></thead>
+              <tbody id="recent-tbody"><tr><td colspan="5"><div class="empty"><div class="spinner spinner-sm" style="margin:0 auto;"></div></div></td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- SHIPMENTS TAB -->
+      <div id="atab-shipments" style="display:none;">
+        <div class="pg-hd">
+          <div><div class="pg-title">All Shipments</div><div class="pg-sub" id="ship-count-l">Loading…</div></div>
+          <button class="btn btn-accent" onclick="showTab('create')"><i class="fa-solid fa-plus"></i> New Shipment</button>
+        </div>
+        <div class="search-row">
+          <div class="input-wrap" style="flex:1;max-width:360px;">
+            <i class="fa-solid fa-search input-icon"></i>
+            <input type="text" id="s-search" class="fi" style="padding-left:38px;" placeholder="Search code, name, status…" oninput="filterShips()"/>
+          </div>
+          <select class="fs" style="width:170px;" id="s-filter" onchange="filterShips()">
+            <option value="">All Statuses</option>
+            <option>Pending</option><option>In Transit</option>
+            <option>Arrived at Hub</option><option>Out for Delivery</option>
+            <option>Delivered</option><option>On Hold</option>
+          </select>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Code</th><th>Sender</th><th>Receiver</th><th>Route</th><th>Status</th><th>ETA</th><th>Actions</th></tr></thead>
+            <tbody id="all-tbody"><tr><td colspan="7"><div class="empty"><div class="spinner spinner-sm" style="margin:0 auto;"></div></div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- CREATE / EDIT TAB -->
+      <div id="atab-create" style="display:none;">
+        <div class="pg-hd">
+          <div><div class="pg-title" id="create-title">Create New Shipment</div><div class="pg-sub">Fill all shipment details below</div></div>
+          <button class="btn btn-ghost" onclick="showTab('shipments')"><i class="fa-solid fa-arrow-left"></i> Back</button>
+        </div>
+        <div class="card"><div class="card-bd">
+          <!-- Shipment Info -->
+          <div class="f-sec"><i class="fa-solid fa-barcode"></i> Shipment Info</div>
+          <div class="f-row">
+            <div class="fg">
+              <label class="fl">Tracking Code</label>
+              <input type="text" id="f-code" class="fi" readonly style="background:var(--bg);font-family:monospace;font-weight:700;color:var(--primary);"/>
+              <input type="hidden" id="f-eid"/>
+            </div>
+            <div class="fg"><label class="fl">Package Description *</label><input type="text" id="f-desc" class="fi" placeholder="e.g. Electronics — Laptop 16""/></div>
+          </div>
+          <div class="f-row">
+            <div class="fg"><label class="fl">Estimated Delivery *</label><input type="datetime-local" id="f-eta" class="fi"/></div>
+            <div class="fg">
+              <label class="fl">Status</label>
+              <select id="f-status" class="fs" onchange="onStatusChange()">
+                <option>Pending</option><option>In Transit</option>
+                <option>Arrived at Hub</option><option>Out for Delivery</option>
+                <option>Delivered</option><option>On Hold</option>
+              </select>
+            </div>
+          </div>
+          <div id="hold-f-field" class="fg" style="display:none;">
+            <label class="fl">Hold Reason *</label>
+            <input type="text" id="f-hold" class="fi" placeholder="e.g. Customs inspection required"/>
+          </div>
+          <div class="fg"><label class="fl">Initial Timeline Message *</label><input type="text" id="f-tmsg" class="fi" placeholder="e.g. Shipment created and awaiting pickup"/></div>
+
+          <hr class="divider"/>
+          <!-- Sender -->
+          <div class="f-sec"><i class="fa-solid fa-user"></i> Sender Details</div>
+          <div class="f-row">
+            <div class="fg"><label class="fl">Full Name *</label><input type="text" id="f-sn" class="fi" placeholder="John Doe"/></div>
+            <div class="fg"><label class="fl">Phone *</label><input type="text" id="f-sp" class="fi" placeholder="+1 234 567 8900"/></div>
+          </div>
+          <div class="f-row">
+            <div class="fg"><label class="fl">Email *</label><input type="email" id="f-se" class="fi" placeholder="sender@email.com"/></div>
+            <div class="fg"><label class="fl">Address *</label><input type="text" id="f-sa" class="fi" placeholder="123 Main St, New York, NY"/></div>
+          </div>
+
+          <hr class="divider"/>
+          <!-- Receiver -->
+          <div class="f-sec"><i class="fa-solid fa-house"></i> Receiver Details</div>
+          <div class="f-row">
+            <div class="fg"><label class="fl">Full Name *</label><input type="text" id="f-rn" class="fi" placeholder="Jane Smith"/></div>
+            <div class="fg"><label class="fl">Phone *</label><input type="text" id="f-rp" class="fi" placeholder="+1 234 567 8901"/></div>
+          </div>
+          <div class="f-row">
+            <div class="fg"><label class="fl">Email *</label><input type="email" id="f-re" class="fi" placeholder="receiver@email.com"/></div>
+            <div class="fg"><label class="fl">Address *</label><input type="text" id="f-ra" class="fi" placeholder="456 Oak Ave, Los Angeles, CA"/></div>
+          </div>
+
+          <hr class="divider"/>
+          <!-- Route -->
+          <div class="f-sec"><i class="fa-solid fa-route"></i> Route Information</div>
+          <div class="f-row">
+            <div class="fg"><label class="fl">Origin Name *</label><input type="text" id="f-on" class="fi" placeholder="New York, USA"/></div>
+            <div class="fg"><label class="fl">Destination Name *</label><input type="text" id="f-dn" class="fi" placeholder="Los Angeles, USA"/></div>
+          </div>
+          <div class="f-row">
+            <div class="fg"><label class="fl">Origin Lat, Lng *</label><input type="text" id="f-oc" class="fi" placeholder="40.7128, -74.0060"/></div>
+            <div class="fg"><label class="fl">Destination Lat, Lng *</label><input type="text" id="f-dc" class="fi" placeholder="34.0522, -118.2437"/></div>
+          </div>
+
+          <hr class="divider"/>
+          <!-- Current Location -->
+          <div class="f-sec"><i class="fa-solid fa-location-crosshairs"></i> Current Location (optional)</div>
+          <div class="f-row">
+            <div class="fg"><label class="fl">Location Label</label><input type="text" id="f-cl" class="fi" placeholder="e.g. Chicago Hub"/></div>
+            <div class="fg"><label class="fl">Current Lat, Lng</label><input type="text" id="f-cc" class="fi" placeholder="41.8781, -87.6298"/></div>
+          </div>
+
+          <div id="form-err" style="color:var(--red);font-size:13px;padding:12px 14px;background:#fee2e2;border-radius:8px;margin-bottom:16px;display:none;"></div>
+          <div style="display:flex;gap:10px;justify-content:flex-end;">
+            <button class="btn btn-ghost" onclick="resetForm();showTab('shipments')">Cancel</button>
+            <button class="btn btn-accent" id="submit-btn" onclick="submitShipment()">
+              <i class="fa-solid fa-save"></i> <span id="submit-lbl">Create Shipment</span>
+            </button>
+          </div>
+        </div></div>
+      </div>
+    </div>
+  </div>
+</div><!-- end admin -->
+
+<!-- ═══ ABOUT PAGE ═══ -->
+<div id="pg-about" class="page">
+  <div class="about-hero">
+    <div class="sec-label" style="background:rgba(249,115,22,.15);color:#fdba74;">Our Story</div>
+    <h1>About XTracking</h1>
+    <p>Pioneering the future of global logistics through technology, trust, and radical transparency.</p>
+  </div>
+  <div class="content-wrap">
+    <!-- Story -->
+    <div class="story-grid">
+      <div>
+        <div class="sec-label">Founded 2015</div>
+        <h2 style="font-family:'Syne',sans-serif;font-size:clamp(26px,3vw,36px);font-weight:800;letter-spacing:-1px;margin:10px 0 18px;">Delivering Trust Since Day One</h2>
+        <p style="color:var(--text-2);line-height:1.8;margin-bottom:14px;">XTracking was founded on a single belief: logistics should be transparent, reliable, and stress-free for everyone involved — sender, receiver, and operator alike.</p>
+        <p style="color:var(--text-2);line-height:1.8;margin-bottom:14px;">What started as a small regional courier tracker has grown into an enterprise-grade global platform trusted by thousands of businesses across 150+ countries.</p>
+        <p style="color:var(--text-2);line-height:1.8;">Our team of engineers, logistics experts, and customer success specialists work around the clock to ensure every package reaches its destination — on time, every time.</p>
+      </div>
+      <div class="story-img-box">
+        <div style="font-size:72px;margin-bottom:18px;animation:float 3s ease-in-out infinite;">📦</div>
+        <h3>Our Mission</h3>
+        <p>To connect the world through reliable, transparent, and technology-driven logistics that empowers businesses of every size to deliver with confidence.</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:24px;">
+          <div style="background:rgba(255,255,255,.08);border-radius:10px;padding:16px;text-align:center;">
+            <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--accent);">12M+</div>
+            <div style="font-size:12px;color:rgba(255,255,255,.6);margin-top:2px;">Deliveries</div>
+          </div>
+          <div style="background:rgba(255,255,255,.08);border-radius:10px;padding:16px;text-align:center;">
+            <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:#22c55e;">98%</div>
+            <div style="font-size:12px;color:rgba(255,255,255,.6);margin-top:2px;">On-Time</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Values -->
+    <div class="sec-hd">
+      <div class="sec-label">Our Values</div>
+      <h2>What Drives Us Forward</h2>
+      <p>Three principles guide everything we build and every decision we make.</p>
+    </div>
+    <div class="values-grid">
+      <div class="val-card">
+        <div class="val-icon" style="background:#dbeafe;color:#1d4ed8;"><i class="fa-solid fa-eye"></i></div>
+        <h3>Transparency</h3>
+        <p>Every update, every location, every milestone is visible in real time. We believe customers deserve full visibility, not vague promises.</p>
+      </div>
+      <div class="val-card">
+        <div class="val-icon" style="background:#dcfce7;color:#15803d;"><i class="fa-solid fa-bolt"></i></div>
+        <h3>Speed</h3>
+        <p>Optimised routes, proactive management, and intelligent scheduling mean your packages arrive faster — not just on time, but ahead of time.</p>
+      </div>
+      <div class="val-card">
+        <div class="val-icon" style="background:#fff7ed;color:#c2410c;"><i class="fa-solid fa-handshake"></i></div>
+        <h3>Reliability</h3>
+        <p>Our 98% on-time delivery rate is backed by redundant systems, proactive monitoring, and a team that never sleeps when your cargo is in motion.</p>
+      </div>
+      <div class="val-card">
+        <div class="val-icon" style="background:#ede9fe;color:#7c3aed;"><i class="fa-solid fa-leaf"></i></div>
+        <h3>Sustainability</h3>
+        <p>We are committed to carbon-neutral operations by 2027 through optimised routing, electric fleet investment, and offset programs.</p>
+      </div>
+    </div>
+    <!-- Team -->
+    <div class="sec-hd" style="margin-top:20px;">
+      <div class="sec-label">The Team</div>
+      <h2>People Behind XTracking</h2>
+      <p>Driven by passion for logistics, technology, and customer delight.</p>
+    </div>
+    <div class="team-grid">
+      <div class="team-card">
+        <div class="team-av" style="background:var(--primary);">JD</div>
+        <div class="team-n">James Davidson</div>
+        <div class="team-r">CEO & Co-Founder</div>
+      </div>
+      <div class="team-card">
+        <div class="team-av" style="background:var(--accent);">SM</div>
+        <div class="team-n">Sarah Mitchell</div>
+        <div class="team-r">Chief Operations Officer</div>
+      </div>
+      <div class="team-card">
+        <div class="team-av" style="background:var(--green);">RL</div>
+        <div class="team-n">Ryan Liu</div>
+        <div class="team-r">Head of Technology</div>
+      </div>
+      <div class="team-card">
+        <div class="team-av" style="background:var(--purple);">AP</div>
+        <div class="team-n">Amara Patel</div>
+        <div class="team-r">Head of Logistics</div>
+      </div>
+      <div class="team-card">
+        <div class="team-av" style="background:#0891b2;">TC</div>
+        <div class="team-n">Thomas Chen</div>
+        <div class="team-r">VP of Engineering</div>
+      </div>
+      <div class="team-card">
+        <div class="team-av" style="background:#be185d;">LW</div>
+        <div class="team-n">Layla Williams</div>
+        <div class="team-r">Head of Customer Success</div>
+      </div>
+    </div>
+  </div>
+</div><!-- end about -->
+
+<!-- ═══ SERVICES PAGE ═══ -->
+<div id="pg-services" class="page">
+  <div class="services-hero">
+    <div class="sec-label" style="background:rgba(249,115,22,.15);color:#fdba74;">What We Offer</div>
+    <h1>Logistics Solutions<br>For Every Need</h1>
+    <p>From same-day local delivery to complex international freight — we have the expertise and infrastructure to handle it all.</p>
+  </div>
+  <div class="services-content">
+    <!-- Services Grid -->
+    <div class="sec-hd">
+      <div class="sec-label">Our Services</div>
+      <h2>Choose Your Shipping Solution</h2>
+      <p>Every service includes full real-time tracking and dedicated support.</p>
+    </div>
+    <div class="srv-grid">
+      <div class="srv-card">
+        <div class="srv-icon" style="background:#dbeafe;color:#1d4ed8;"><i class="fa-solid fa-truck-fast"></i></div>
+        <h3>Express Delivery</h3>
+        <p>Same-day and next-day delivery for time-critical shipments. Guaranteed delivery windows with live GPS tracking every step of the way.</p>
+        <div class="srv-tag"><span>Same Day</span><span>Next Day</span><span>Priority</span></div>
+      </div>
+      <div class="srv-card">
+        <div class="srv-icon" style="background:#dcfce7;color:#15803d;"><i class="fa-solid fa-plane-departure"></i></div>
+        <h3>Air Freight</h3>
+        <p>Fast international shipping via major air cargo networks. Complete customs handling, documentation, and door-to-door delivery included.</p>
+        <div class="srv-tag"><span>International</span><span>Customs Handled</span><span>Door-to-Door</span></div>
+      </div>
+      <div class="srv-card">
+        <div class="srv-icon" style="background:#fff7ed;color:#c2410c;"><i class="fa-solid fa-ship"></i></div>
+        <h3>Ocean Freight</h3>
+        <p>Cost-effective bulk shipping via global sea routes. Full container load (FCL) and less-than-container load (LCL) options available.</p>
+        <div class="srv-tag"><span>FCL</span><span>LCL</span><span>Bulk Cargo</span></div>
+      </div>
+      <div class="srv-card">
+        <div class="srv-icon" style="background:#ede9fe;color:#7c3aed;"><i class="fa-solid fa-warehouse"></i></div>
+        <h3>Warehousing & Fulfillment</h3>
+        <p>Secure, climate-controlled storage with automated inventory management, pick-and-pack, and same-day fulfillment capabilities.</p>
+        <div class="srv-tag"><span>Climate-Controlled</span><span>Inventory Mgmt</span><span>Pick & Pack</span></div>
+      </div>
+      <div class="srv-card">
+        <div class="srv-icon" style="background:#fdf4ff;color:#a21caf;"><i class="fa-solid fa-rotate-left"></i></div>
+        <h3>Reverse Logistics</h3>
+        <p>Streamlined returns management with easy scheduling, automated refund processing integration, and real-time return tracking.</p>
+        <div class="srv-tag"><span>Easy Returns</span><span>Refund Integration</span><span>Tracking</span></div>
+      </div>
+      <div class="srv-card">
+        <div class="srv-icon" style="background:#f0fdf4;color:#15803d;"><i class="fa-solid fa-chart-line"></i></div>
+        <h3>Analytics & Insights</h3>
+        <p>Comprehensive dashboards, delivery performance reports, and supply chain optimization recommendations powered by real logistics data.</p>
+        <div class="srv-tag"><span>Live Dashboards</span><span>Reports</span><span>Optimization</span></div>
+      </div>
+    </div>
+
+    <!-- Process -->
+    <div class="process-sec">
+      <div class="sec-hd">
+        <div class="sec-label">How It Works</div>
+        <h2>Simple, 4-Step Process</h2>
+        <p>From booking to delivery — seamless and fully tracked.</p>
+      </div>
+      <div class="process-steps">
+        <div class="proc-step">
+          <div class="proc-num">01</div>
+          <h4>Book Online</h4>
+          <p>Submit your shipment details via our admin portal. Tracking code generated instantly.</p>
+        </div>
+        <div class="proc-step">
+          <div class="proc-num">02</div>
+          <h4>We Collect</h4>
+          <p>Our team picks up your package from the origin address at your scheduled time.</p>
+        </div>
+        <div class="proc-step">
+          <div class="proc-num">03</div>
+          <h4>In Transit</h4>
+          <p>Package moves through our optimised network with real-time location updates.</p>
+        </div>
+        <div class="proc-step">
+          <div class="proc-num">04</div>
+          <h4>Delivered</h4>
+          <p>Safe delivery with digital proof of receipt. Full timeline preserved forever.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="pricing-cta">
+      <h2>Need a Custom Solution?</h2>
+      <p>Our logistics experts will design a bespoke shipping strategy tailored to your business requirements and volume.</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <button class="btn btn-accent btn-xl" onclick="go('contact')">Contact Sales Team</button>
+        <button class="btn btn-xl" style="background:rgba(255,255,255,.1);color:white;border:1px solid rgba(255,255,255,.2);" onclick="go('home')">Track a Package</button>
+      </div>
+    </div>
+  </div>
+</div><!-- end services -->
+
+<!-- ═══ CONTACT PAGE ═══ -->
+<div id="pg-contact" class="page">
+  <div class="contact-hero">
+    <div class="sec-label" style="background:rgba(249,115,22,.15);color:#fdba74;">Reach Out</div>
+    <h1>Get In Touch</h1>
+    <p>Have a question, need a quote, or dealing with a shipment issue? We're here 24 hours a day, 7 days a week.</p>
+  </div>
+  <div class="contact-wrap">
+    <div class="contact-layout">
+      <!-- Info Column -->
+      <div>
+        <h3 style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:22px;">Contact Information</h3>
+        <div class="ci-item">
+          <div class="ci-icon"><i class="fa-solid fa-location-dot"></i></div>
+          <div class="ci-text"><h4>Headquarters</h4><p>1200 Harbor Blvd, Suite 900<br>New York, NY 10001, USA</p></div>
+        </div>
+        <div class="ci-item">
+          <div class="ci-icon"><i class="fa-solid fa-phone"></i></div>
+          <div class="ci-text"><h4>Phone</h4><p>+1 (800) 987-6543<br><span style="font-size:12px;color:var(--text-3);">Mon–Fri, 8AM–8PM EST</span></p></div>
+        </div>
+        <div class="ci-item">
+          <div class="ci-icon"><i class="fa-solid fa-envelope"></i></div>
+          <div class="ci-text"><h4>Email</h4><p>support@xtracking.com<br>sales@xtracking.com</p></div>
+        </div>
+        <div class="ci-item">
+          <div class="ci-icon"><i class="fa-solid fa-clock"></i></div>
+          <div class="ci-text"><h4>Hours</h4><p>Online Support: 24/7<br>Phone: Mon–Fri 8AM–8PM</p></div>
+        </div>
+        <div class="ci-item">
+          <div class="ci-icon"><i class="fa-brands fa-whatsapp"></i></div>
+          <div class="ci-text"><h4>WhatsApp Business</h4><p>+1 (800) 987-XTRK<br><span style="font-size:12px;color:var(--text-3);">Instant replies guaranteed</span></p></div>
+        </div>
+        <div class="emerg-box">
+          <h4>🚨 Emergency Shipment?</h4>
+          <p>For urgent lost or damaged shipment issues, call our priority line:</p>
+          <div class="emerg-num">+1 (800) 111-XTRK</div>
+        </div>
+      </div>
+      <!-- Form Column -->
+      <div class="card">
+        <div class="card-hd"><div class="card-title"><i class="fa-solid fa-paper-plane" style="color:var(--accent);"></i> Send a Message</div></div>
+        <div class="card-bd">
+          <div class="f-row">
+            <div class="fg"><label class="fl">First Name *</label><input type="text" id="c-fn" class="fi" placeholder="John"/></div>
+            <div class="fg"><label class="fl">Last Name *</label><input type="text" id="c-ln" class="fi" placeholder="Doe"/></div>
+          </div>
+          <div class="fg"><label class="fl">Email *</label><input type="email" id="c-em" class="fi" placeholder="you@company.com"/></div>
+          <div class="fg"><label class="fl">Phone</label><input type="tel" id="c-ph" class="fi" placeholder="+1 234 567 8900"/></div>
+          <div class="fg">
+            <label class="fl">Subject</label>
+            <select class="fs" id="c-subj">
+              <option>General Inquiry</option><option>Tracking Issue</option>
+              <option>Shipment Delay</option><option>Sales & Pricing</option>
+              <option>Technical Support</option><option>Partnership</option><option>Other</option>
+            </select>
+          </div>
+          <div class="fg"><label class="fl">Tracking Code (optional)</label><input type="text" id="c-tc" class="fi" placeholder="XTR-XXXXXX"/></div>
+          <div class="fg"><label class="fl">Message *</label><textarea id="c-msg" class="fta" placeholder="Tell us how we can help you…"></textarea></div>
+          <button class="btn btn-accent btn-block" onclick="submitContact()"><i class="fa-solid fa-paper-plane"></i> Send Message</button>
+          <p style="font-size:12px;color:var(--text-3);text-align:center;margin-top:12px;"><i class="fa-solid fa-lock"></i> Your data is secure. We never share your information.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div><!-- end contact -->
+
+</main><!-- end app-main -->
+
+<!-- ====================================================
+     MODALS
+     ==================================================== -->
+<!-- Quick Update Modal -->
+<div class="mo" id="mo-edit">
+  <div class="mo-box" style="max-width:520px;">
+    <div class="mo-hd">
+      <div class="mo-title"><i class="fa-solid fa-pen-to-square" style="color:var(--accent);"></i> Update Shipment</div>
+      <button class="mo-close" onclick="closeMo('mo-edit')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="mo-bd">
+      <p style="font-size:13px;color:var(--text-2);margin-bottom:18px;">Code: <strong id="mo-code" style="font-family:monospace;color:var(--primary);"></strong></p>
+      <div class="fg">
+        <label class="fl">New Status *</label>
+        <select id="mo-status" class="fs" onchange="onMoStatusChange()">
+          <option>Pending</option><option>In Transit</option>
+          <option>Arrived at Hub</option><option>Out for Delivery</option>
+          <option>Delivered</option><option>On Hold</option>
+        </select>
+      </div>
+      <div id="mo-hold-f" class="fg" style="display:none;">
+        <label class="fl">Hold Reason *</label>
+        <input type="text" id="mo-hold" class="fi" placeholder="Reason for hold…"/>
+      </div>
+      <div id="mo-resume-info" style="display:none;background:#dcfce7;border-radius:8px;padding:12px 14px;margin-bottom:14px;font-size:13px;color:#15803d;font-weight:500;">
+        <i class="fa-solid fa-play-circle"></i> Resuming: ETA will be recalculated from remaining time.
+      </div>
+      <div class="f-row">
+        <div class="fg"><label class="fl">Location Label</label><input type="text" id="mo-cl" class="fi" placeholder="e.g. Chicago Hub"/></div>
+        <div class="fg"><label class="fl">Current Lat, Lng</label><input type="text" id="mo-cc" class="fi" placeholder="41.87, -87.62"/></div>
+      </div>
+      <div class="fg"><label class="fl">Timeline Message *</label><input type="text" id="mo-tmsg" class="fi" placeholder="Describe this status update…"/></div>
+    </div>
+    <div class="mo-ft">
+      <button class="btn btn-ghost" onclick="closeMo('mo-edit')">Cancel</button>
+      <button class="btn btn-accent" id="mo-save-btn" onclick="saveMoUpdate()"><i class="fa-solid fa-save"></i> Save Update</button>
+    </div>
+  </div>
+</div>
+
+<!-- View Shipment Modal -->
+<div class="mo" id="mo-view">
+  <div class="mo-box" style="max-width:680px;">
+    <div class="mo-hd">
+      <div class="mo-title"><i class="fa-solid fa-box" style="color:var(--primary);"></i> Shipment Details</div>
+      <button class="mo-close" onclick="closeMo('mo-view')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="mo-bd" id="mo-view-body"></div>
+    <div class="mo-ft"><button class="btn btn-ghost" onclick="closeMo('mo-view')">Close</button></div>
+  </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="mo" id="mo-del">
+  <div class="mo-box" style="max-width:400px;">
+    <div class="mo-hd">
+      <div class="mo-title" style="color:var(--red);"><i class="fa-solid fa-triangle-exclamation"></i> Confirm Delete</div>
+      <button class="mo-close" onclick="closeMo('mo-del')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="mo-bd">
+      <p>Permanently delete shipment <strong id="del-code" style="font-family:monospace;color:var(--primary);"></strong>?</p>
+      <p style="margin-top:10px;font-size:13px;color:var(--text-2);">This action <strong>cannot be undone.</strong> All timeline data will be lost.</p>
+    </div>
+    <div class="mo-ft">
+      <button class="btn btn-ghost" onclick="closeMo('mo-del')">Cancel</button>
+      <button class="btn btn-danger" id="del-confirm-btn" onclick="confirmDel()"><i class="fa-solid fa-trash"></i> Delete Permanently</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====================================================
+     FOOTER
+     ==================================================== -->
+<footer>
+  <div class="footer-grid">
+    <div class="ft-brand">
+      <h3>X<em>Tracking</em> v2</h3>
+      <p>Enterprise logistics tracking platform with real-time GPS simulation, Firebase persistence, smart ETA engine, and full admin control.</p>
+    </div>
+    <div class="ft-col">
+      <h4>Navigate</h4>
+      <ul>
+        <li><a onclick="go('home')">Home</a></li>
+        <li><a onclick="go('about')">About Us</a></li>
+        <li><a onclick="go('services')">Services</a></li>
+        <li><a onclick="go('contact')">Contact</a></li>
+      </ul>
+    </div>
+    <div class="ft-col">
+      <h4>Services</h4>
+      <ul>
+        <li><a onclick="go('services')">Express Delivery</a></li>
+        <li><a onclick="go('services')">Air Freight</a></li>
+        <li><a onclick="go('services')">Ocean Freight</a></li>
+        <li><a onclick="go('services')">Warehousing</a></li>
+      </ul>
+    </div>
+    <div class="ft-col">
+      <h4>Legal</h4>
+      <ul>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Terms of Service</a></li>
+        <li><a href="#">Cookie Policy</a></li>
+        <li><a onclick="go('contact')">Support</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="ft-bottom">
+    <span>© 2025 XTracking v2. All rights reserved.</span>
+    <span style="color:rgba(255,255,255,.3);">Firebase · Leaflet.js · DM Sans · Syne</span>
+  </div>
+</footer>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<!-- ====================================================
+     JAVASCRIPT
+     ==================================================== -->
+<script>
+'use strict';
+
+/* ──────────────────────────────────────────────
+   1.  APP STATE
+   ────────────────────────────────────────────── */
+const A = {
+  db: null, auth: null, user: null,
+  demo: false, ships: [],
+  etaTimer: null, mapTimer: null,
+  mapInst: null, movMarker: null,
+  editId: null, delId: null, delCode: null,
+};
+
+const STATUS = {
+  'Pending':          { cls:'b-pending',  col:'#888',     icon:'fa-clock' },
+  'In Transit':       { cls:'b-transit',  col:'#1d4ed8',  icon:'fa-truck' },
+  'Arrived at Hub':   { cls:'b-hub',      col:'#7c3aed',  icon:'fa-warehouse' },
+  'Out for Delivery': { cls:'b-delivery', col:'#c2410c',  icon:'fa-motorcycle' },
+  'Delivered':        { cls:'b-delivered',col:'#15803d',  icon:'fa-circle-check' },
+  'On Hold':          { cls:'b-hold',     col:'#dc2626',  icon:'fa-circle-pause' },
+};
+
+/* ──────────────────────────────────────────────
+   2.  DEMO DATA
+   ────────────────────────────────────────────── */
+const DEMO = [
+  {
+    id:'d1', trackingCode:'XTR-DEMO01',
+    packageDescription:'Electronics — MacBook Pro 16"',
+    status:'In Transit', holdReason:'',
+    sender:{ name:'TechCorp Inc.', address:'100 Broadway, New York, NY 10005', phone:'+1 212-555-0100', email:'shipping@techcorp.com' },
+    receiver:{ name:'Alice Johnson', address:'456 Sunset Blvd, Los Angeles, CA 90028', phone:'+1 323-555-0200', email:'alice@email.com' },
+    origin:{ name:'New York, USA', lat:40.7128, lng:-74.006 },
+    destination:{ name:'Los Angeles, USA', lat:34.0522, lng:-118.2437 },
+    currentLocation:{ label:'St. Louis Hub', lat:38.627, lng:-90.1994 },
+    timeline:[
+      { status:'Pending',    message:'Shipment created, awaiting pickup.',            timestamp:new Date(Date.now()-4*864e5) },
+      { status:'In Transit', message:'Picked up from origin. Heading to departure hub.',timestamp:new Date(Date.now()-3*864e5) },
+      { status:'In Transit', message:'Departed New York JFK — en route to Los Angeles.',timestamp:new Date(Date.now()-2*864e5) },
+      { status:'In Transit', message:'Arrived St. Louis Hub for sorting.',              timestamp:new Date(Date.now()-864e5) },
+    ],
+    createdAt:new Date(Date.now()-4*864e5),
+    estimatedDelivery:new Date(Date.now()+2*864e5),
+    remainingTime:null,
+  },
+  {
+    id:'d2', trackingCode:'XTR-DEMO02',
+    packageDescription:'Luxury Goods — Designer Handbag',
+    status:'On Hold', holdReason:'Customs inspection required at US border.',
+    sender:{ name:'LuxuryGoods Paris', address:'15 Rue de Rivoli, Paris, France', phone:'+33 1-555-0300', email:'export@luxgoods.fr' },
+    receiver:{ name:'Emma Williams', address:'789 Michigan Ave, Chicago, IL 60611', phone:'+1 312-555-0400', email:'emma@email.com' },
+    origin:{ name:'Paris, France', lat:48.8566, lng:2.3522 },
+    destination:{ name:'Chicago, USA', lat:41.8781, lng:-87.6298 },
+    currentLocation:{ label:'JFK Customs, New York', lat:40.6413, lng:-73.7781 },
+    timeline:[
+      { status:'Pending',        message:'Shipment created.',                      timestamp:new Date(Date.now()-7*864e5) },
+      { status:'In Transit',     message:'Departed Paris CDG Airport.',            timestamp:new Date(Date.now()-6*864e5) },
+      { status:'Arrived at Hub', message:'Arrived JFK International — hub intake.',timestamp:new Date(Date.now()-5*864e5) },
+      { status:'On Hold',        message:'Held for customs inspection — awaiting clearance.',timestamp:new Date(Date.now()-3*864e5) },
+    ],
+    createdAt:new Date(Date.now()-7*864e5),
+    estimatedDelivery:new Date(Date.now()+5*864e5),
+    remainingTime:5*864e5,
+  },
+  {
+    id:'d3', trackingCode:'XTR-DEMO03',
+    packageDescription:'Medical Supplies — Insulin Kit',
+    status:'Delivered', holdReason:'',
+    sender:{ name:'MedPharm Solutions', address:'555 Pharma Way, Houston, TX 77002', phone:'+1 713-555-0500', email:'dispatch@medpharm.com' },
+    receiver:{ name:'Dr. Carlos Rivera', address:'321 Health Blvd, Miami, FL 33101', phone:'+1 305-555-0600', email:'c.rivera@clinic.com' },
+    origin:{ name:'Houston, USA', lat:29.7604, lng:-95.3698 },
+    destination:{ name:'Miami, USA', lat:25.7617, lng:-80.1918 },
+    currentLocation:{ label:'Delivered to recipient', lat:25.7617, lng:-80.1918 },
+    timeline:[
+      { status:'Pending',          message:'Shipment created.',                          timestamp:new Date(Date.now()-5*864e5) },
+      { status:'In Transit',       message:'Package in transit via priority air freight.',timestamp:new Date(Date.now()-4*864e5) },
+      { status:'Arrived at Hub',   message:'Arrived Miami International Airport hub.',   timestamp:new Date(Date.now()-2*864e5) },
+      { status:'Out for Delivery', message:'Out for delivery in Miami.',                 timestamp:new Date(Date.now()-864e5) },
+      { status:'Delivered',        message:'Delivered and signed by Dr. Rivera.',        timestamp:new Date(Date.now()-432e5) },
+    ],
+    createdAt:new Date(Date.now()-5*864e5),
+    estimatedDelivery:new Date(Date.now()-432e5),
+    remainingTime:null,
+  },
+];
+
+/* ──────────────────────────────────────────────
+   3.  FIREBASE INIT
+   ────────────────────────────────────────────── */
+function initFB(cfg) {
+  try {
+    if (firebase.apps.length) firebase.apps.forEach(ap => ap.delete());
+    firebase.initializeApp(cfg);
+    A.db   = firebase.firestore();
+    A.auth = firebase.auth();
+    return true;
+  } catch(e) { console.error(e); return false; }
+}
+function loadCfg() {
+  try {
+    const c = JSON.parse(localStorage.getItem('xt_fb_cfg') || '{}');
+    if (c.apiKey && c.projectId) { return initFB(c); }
+  } catch(e) {}
+  return false;
+}
+function saveCfg(c) { localStorage.setItem('xt_fb_cfg', JSON.stringify(c)); }
+
+/* ──────────────────────────────────────────────
+   4.  SETUP MODAL
+   ────────────────────────────────────────────── */
+let setupStep = 1;
+function showSetup() {
+  document.getElementById('setup-overlay').classList.add('show');
+  setupStep = 1; renderSetupStep();
+}
+function hideSetup() { document.getElementById('setup-overlay').classList.remove('show'); }
+function renderSetupStep() {
+  document.getElementById('setup-s1').style.display = setupStep===1 ? 'block':'none';
+  document.getElementById('setup-s2').style.display = setupStep===2 ? 'block':'none';
+  const btn = document.getElementById('setup-next-btn');
+  if (setupStep===1) { btn.innerHTML='Connect Firebase <i class="fa-solid fa-arrow-right"></i>'; btn.onclick=connectFB; }
+  else               { btn.innerHTML='<i class="fa-solid fa-user-plus"></i> Create Admin'; btn.onclick=createAdmin; }
+}
+async function connectFB() {
+  const cfg = {
+    apiKey:            document.getElementById('fb-key').value.trim(),
+    authDomain:        document.getElementById('fb-auth').value.trim(),
+    projectId:         document.getElementById('fb-proj').value.trim(),
+    storageBucket:     document.getElementById('fb-store').value.trim(),
+    messagingSenderId: document.getElementById('fb-msg').value.trim(),
+    appId:             document.getElementById('fb-app').value.trim(),
+  };
+  const errEl = document.getElementById('setup-err1');
+  if (!cfg.apiKey || !cfg.projectId || !cfg.appId) {
+    errEl.textContent='Please fill API Key, Project ID and App ID.'; errEl.style.display='block'; return;
+  }
+  const btn = document.getElementById('setup-next-btn');
+  btn.classList.add('btn-loading'); btn.disabled=true;
+  try {
+    if (!initFB(cfg)) throw new Error('Init failed');
+    // Test against shipments — public read is allowed by rules
+    await A.db.collection('shipments').limit(1).get();
+    saveCfg(cfg); A.demo=false; errEl.style.display='none';
+    setupStep=2; renderSetupStep();
+    setupAuthListener();
+  } catch(e) {
+    errEl.textContent='Connection failed: '+e.message; errEl.style.display='block';
+  } finally { btn.classList.remove('btn-loading'); btn.disabled=false; }
+}
+async function createAdmin() {
+  const em  = document.getElementById('admin-em').value.trim();
+  const pw  = document.getElementById('admin-pw').value;
+  const pw2 = document.getElementById('admin-pw2').value;
+  const errEl = document.getElementById('setup-err2');
+  if (!em||!pw)            { errEl.textContent='Email and password required.';    errEl.style.display='block'; return; }
+  if (pw.length < 6)       { errEl.textContent='Password min 6 chars.';          errEl.style.display='block'; return; }
+  if (pw !== pw2)          { errEl.textContent='Passwords do not match.';        errEl.style.display='block'; return; }
+  const btn = document.getElementById('setup-next-btn');
+  btn.classList.add('btn-loading'); btn.disabled=true;
+  try {
+    const cred = await A.auth.createUserWithEmailAndPassword(em, pw);
+    A.user = cred.user; updateNav(A.user); hideSetup();
+    toast('success','Setup complete!','Firebase connected and admin account created.');
+    go('admin');
+  } catch(e) {
+    let m = e.message;
+    if (e.code==='auth/email-already-in-use') m='Email already registered. Try logging in.';
+    errEl.textContent=m; errEl.style.display='block';
+  } finally { btn.classList.remove('btn-loading'); btn.disabled=false; }
+}
+document.getElementById('setup-demo-btn').onclick = () => {
+  A.demo=true; A.ships=[...DEMO];
+  A.user=null; updateNav(null);          // ← no auto-login; admin still requires credentials
+  hideSetup();
+  toast('info','Demo Mode Active',
+    'Public tracking uses sample data. Admin login: admin@demo.com / demo1234',8000);
+};
+document.getElementById('setup-next-btn').onclick = connectFB;
+
+/* ──────────────────────────────────────────────
+   5.  AUTH
+   ────────────────────────────────────────────── */
+function setupAuthListener() {
+  if (!A.auth) return;
+  A.auth.onAuthStateChanged(u => { A.user=u; updateNav(u); });
+}
+function updateNav(u) {
+  const isAuth = !!u;
+  document.getElementById('nl-admin').style.display = isAuth?'block':'none';
+  document.getElementById('nl-login').style.display = isAuth?'none':'block';
+  document.getElementById('nav-user').style.display = isAuth?'flex':'none';
+  document.getElementById('mob-admin').style.display  = isAuth?'block':'none';
+  document.getElementById('mob-login').style.display  = isAuth?'none':'block';
+  document.getElementById('mob-logout').style.display = isAuth?'block':'none';
+  if (u) {
+    document.getElementById('nav-av').textContent = (u.email||'A').charAt(0).toUpperCase();
+    document.getElementById('nav-uem').textContent = u.email;
+  }
+  // Hide demo hint if Firebase is configured (not demo mode)
+  const hint = document.getElementById('demo-hint');
+  if (hint) hint.style.display = A.demo ? 'block' : 'none';
+}
+async function doLogin() {
+  const em    = document.getElementById('l-email').value.trim();
+  const pw    = document.getElementById('l-pass').value;
+  const errEl = document.getElementById('l-err');
+  errEl.textContent='';
+  if (!em||!pw) { errEl.textContent='Email and password are required.'; return; }
+
+  /* ── DEMO MODE: check hardcoded credentials ── */
+  if (A.demo) {
+    if (em==='admin@demo.com' && pw==='demo1234') {
+      A.user={email:'admin@demo.com'}; updateNav(A.user);
+      go('admin');
+    } else {
+      errEl.textContent='Invalid credentials.  Demo → admin@demo.com / demo1234';
+    }
+    return;
+  }
+
+  /* ── FIREBASE MODE ── */
+  if (!A.auth) { toast('warning','Not configured','Set up Firebase first.'); showSetup(); return; }
+  const btn=document.getElementById('l-btn'); btn.classList.add('btn-loading'); btn.disabled=true;
+  try {
+    await A.auth.signInWithEmailAndPassword(em,pw);
+    go('admin');
+  } catch(e) {
+    let m='Invalid email or password.';
+    if (e.code==='auth/too-many-requests') m='Too many attempts. Please try later.';
+    errEl.textContent=m;
+  } finally { btn.classList.remove('btn-loading'); btn.disabled=false; }
+}
+async function doSignOut() {
+  if (A.auth) try { await A.auth.signOut(); } catch(e) {}
+  A.user=null; updateNav(null);
+  // if in demo mode, keep demo data but lock admin again
+  go('home');
+  toast('info','Signed out','You have been signed out of the admin panel.');
+}
+/* Enter key on login */
+document.getElementById('l-pass').addEventListener('keypress',e=>{ if(e.key==='Enter') doLogin(); });
+
+/* ──────────────────────────────────────────────
+   6.  DATA / FIRESTORE
+   ────────────────────────────────────────────── */
+function genCode() {
+  const c='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  return 'XTR-'+Array.from({length:6},()=>c[Math.floor(Math.random()*c.length)]).join('');
+}
+async function dbCreate(data) {
+  if (A.demo) { const s={...data,id:'d'+Date.now()}; A.ships.unshift(s); return s; }
+  const ref = await A.db.collection('shipments').add({...data, createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+  return {id:ref.id,...data};
+}
+async function dbUpdate(id,data) {
+  if (A.demo) { const i=A.ships.findIndex(s=>s.id===id); if(i>-1) A.ships[i]={...A.ships[i],...data}; return; }
+  await A.db.collection('shipments').doc(id).update(data);
+}
+async function dbDelete(id) {
+  if (A.demo) { A.ships=A.ships.filter(s=>s.id!==id); return; }
+  await A.db.collection('shipments').doc(id).delete();
+}
+async function dbGetByCode(code) {
+  if (A.demo) return A.ships.find(s=>s.trackingCode.toUpperCase()===code.toUpperCase())||null;
+  const q = await A.db.collection('shipments').where('trackingCode','==',code.toUpperCase()).limit(1).get();
+  if (q.empty) return null;
+  return {id:q.docs[0].id,...q.docs[0].data()};
+}
+async function dbGetAll() {
+  if (A.demo) return [...A.ships];
+  const q = await A.db.collection('shipments').orderBy('createdAt','desc').get();
+  return q.docs.map(d=>({id:d.id,...d.data()}));
+}
+
+/* ──────────────────────────────────────────────
+   7.  ROUTER
+   ────────────────────────────────────────────── */
+function go(page, params={}) {
+  clearInterval(A.etaTimer); clearInterval(A.mapTimer);
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('[data-page]').forEach(l=>l.classList.toggle('active',l.dataset.page===page));
+  A.page = page;
+  const pages = {
+    home:'pg-home', about:'pg-about', services:'pg-services',
+    contact:'pg-contact', login:'pg-login', admin:'pg-admin', track:'pg-track'
+  };
+  const pid = pages[page];
+  if (pid) document.getElementById(pid).classList.add('active');
+  if (page==='admin') {
+    if (!A.user) { go('login'); return; }   // always require real auth
+    loadDash();
+  }
+  if (page==='track' && params.code) loadTrack(params.code);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ──────────────────────────────────────────────
+   8.  HOME
+   ────────────────────────────────────────────── */
+function trackFromHero() {
+  const v = document.getElementById('hero-inp').value.trim();
+  if (!v) { toast('warning','Enter a code','Type your tracking code first.'); document.getElementById('hero-inp').focus(); return; }
+  go('track',{code:v});
+}
+document.getElementById('hero-inp').addEventListener('keypress',e=>{ if(e.key==='Enter') trackFromHero(); });
+
+/* ──────────────────────────────────────────────
+   9.  TRACKING PAGE
+   ────────────────────────────────────────────── */
+async function loadTrack(code) {
+  const lo=document.getElementById('tr-loading'), er=document.getElementById('tr-error'), co=document.getElementById('tr-content');
+  lo.style.display='block'; er.style.display='none'; co.style.display='none';
+  try {
+    const s = await dbGetByCode(code);
+    if (!s) { lo.style.display='none'; er.style.display='block'; return; }
+    lo.style.display='none'; co.style.display='block';
+    renderTrack(s); startETA(s); initMap(s); startMapSim(s);
+  } catch(e) { console.error(e); lo.style.display='none'; er.style.display='block'; }
+}
+function renderTrack(s) {
+  const sc = STATUS[s.status]||STATUS['Pending'];
+  document.getElementById('tc-code-txt').textContent = s.trackingCode;
+  document.getElementById('tc-pkg').textContent      = s.packageDescription||'Package';
+  document.getElementById('tc-route').textContent    = `${s.origin?.name||'Origin'} → ${s.destination?.name||'Destination'}`;
+  document.getElementById('tc-status').innerHTML     = badge(s.status);
+  const locPill = document.getElementById('tc-loc-pill');
+  if (s.currentLocation?.label) {
+    locPill.style.display='inline-flex';
+    document.getElementById('tc-loc-txt').textContent=s.currentLocation.label;
+  } else locPill.style.display='none';
+  const hb = document.getElementById('hold-banner');
+  if (s.status==='On Hold'&&s.holdReason) { hb.style.display='flex'; document.getElementById('hold-reason').textContent=s.holdReason; }
+  else hb.style.display='none';
+  // Parties
+  const f=(id,v)=>{ const el=document.getElementById(id); if(el) el.textContent=v||'-'; };
+  f('tc-sn',s.sender?.name); f('tc-sa',s.sender?.address); f('tc-sp',s.sender?.phone); f('tc-se',s.sender?.email);
+  f('tc-rn',s.receiver?.name); f('tc-ra',s.receiver?.address); f('tc-rp',s.receiver?.phone); f('tc-re',s.receiver?.email);
+  renderTimeline(s.timeline||[]);
+}
+function badge(status) {
+  const sc=STATUS[status]||STATUS['Pending'];
+  return `<span class="badge ${sc.cls}"><span class="bdot"></span>${status}</span>`;
+}
+function renderTimeline(tl) {
+  const el = document.getElementById('tc-timeline');
+  if (!tl.length) { el.innerHTML='<p style="color:var(--text-3);">No timeline entries yet.</p>'; return; }
+  const sorted = [...tl].sort((a,b)=>getTs(b.timestamp)-getTs(a.timestamp));
+  el.innerHTML = sorted.map((e,i)=>{
+    const sc=STATUS[e.status]||STATUS['Pending'], ts=getTs(e.timestamp);
+    return `<div class="tl-item ${i===0?'current':''}">
+      <div class="tl-dot" style="background:${sc.col};"></div>
+      <div class="tl-time">${fmtDT(ts)}</div>
+      <div class="tl-status"><i class="fa-solid ${sc.icon}" style="color:${sc.col};margin-right:5px;"></i>${e.status}</div>
+      <div class="tl-msg">${e.message}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ──────────────────────────────────────────────
+   10. ETA LOGIC
+   ────────────────────────────────────────────── */
+function startETA(s) {
+  clearInterval(A.etaTimer);
+  const tick=()=>{
+    const now=Date.now();
+    const etaTs=getTs(s.estimatedDelivery)||now;
+    const creTs=getTs(s.createdAt)||(etaTs-864e5*7);
+    const totalDur=Math.max(1,etaTs-creTs);
+    const isHold=s.status==='On Hold';
+    const isDel =s.status==='Delivered';
+    // Frozen pill
+    document.getElementById('eta-frozen').style.display  = isHold?'flex':'none';
+    document.getElementById('eta-row').style.opacity     = isHold?'.5':'1';
+    // Countdown value
+    let rem;
+    if (isHold)  rem = s.remainingTime!=null ? s.remainingTime : Math.max(0,etaTs-now);
+    else if(isDel) rem=0;
+    else rem = Math.max(0,etaTs-now);
+    renderCountdown(rem);
+    // Progress bar
+    const elapsed=now-creTs;
+    const prog=isDel?100:Math.min(100,Math.max(0,(elapsed/totalDur)*100));
+    document.getElementById('eta-prog').style.width=prog+'%';
+    // Date label
+    document.getElementById('eta-dt').textContent =
+      isDel?'✓ Delivered':
+      isHold?'⏸ ETA on hold — remaining time preserved':
+      rem>0?'Expected: '+fmtDT(etaTs):'⚠ Delivery overdue — contact support';
+  };
+  tick(); A.etaTimer=setInterval(tick,1000);
+}
+function renderCountdown(ms) {
+  const s=v=>String(Math.floor(v)).padStart(2,'0');
+  if(ms<=0){['ed','eh','em','es'].forEach(id=>document.getElementById(id).textContent='00');return;}
+  document.getElementById('ed').textContent=s(ms/864e5);
+  document.getElementById('eh').textContent=s((ms%864e5)/36e5);
+  document.getElementById('em').textContent=s((ms%36e5)/6e4);
+  document.getElementById('es').textContent=s((ms%6e4)/1e3);
+}
+
+/* ──────────────────────────────────────────────
+   11. MAP
+   ────────────────────────────────────────────── */
+function initMap(s) {
+  if (A.mapInst) { A.mapInst.remove(); A.mapInst=null; A.movMarker=null; }
+  const oLat=s.origin?.lat||40.7128, oLng=s.origin?.lng||-74.006;
+  const dLat=s.destination?.lat||34.0522, dLng=s.destination?.lng||-118.2437;
+  const cLat=s.currentLocation?.lat||oLat, cLng=s.currentLocation?.lng||oLng;
+  const mLat=(oLat+dLat)/2, mLng=(oLng+dLng)/2;
+  setTimeout(()=>{
+    try {
+      A.mapInst=L.map('track-map',{zoomControl:true}).setView([mLat,mLng],4);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:18}).addTo(A.mapInst);
+      const mk=(color,emoji,size=28)=>L.divIcon({className:'',
+        html:`<div style="width:${size}px;height:${size}px;background:${color};border:3px solid white;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 12px rgba(0,0,0,.3);font-size:${size*0.45}px;">${emoji}</div>`,
+        iconSize:[size,size],iconAnchor:[size/2,size/2]});
+      L.marker([oLat,oLng],{icon:mk('#22c55e','▲')}).addTo(A.mapInst)
+        .bindPopup(`<b>Origin</b><br>${s.origin?.name||'Origin'}`);
+      L.marker([dLat,dLng],{icon:mk('#ef4444','★')}).addTo(A.mapInst)
+        .bindPopup(`<b>Destination</b><br>${s.destination?.name||'Destination'}`);
+      L.polyline([[oLat,oLng],[cLat,cLng],[dLat,dLng]],
+        {color:'#3b82f6',weight:2.5,opacity:.5,dashArray:'8,8'}).addTo(A.mapInst);
+      A.movMarker=L.marker([cLat,cLng],{icon:mk('#3b82f6','📦',34)}).addTo(A.mapInst)
+        .bindPopup(`<b>Current</b><br>${s.currentLocation?.label||'In Transit'}`);
+      A.mapInst.invalidateSize();
+    } catch(e){ console.error('Map error:',e); }
+  },120);
+}
+function startMapSim(s) {
+  clearInterval(A.mapTimer);
+  if (s.status==='On Hold'||s.status==='Delivered') return;
+  const oLat=s.origin?.lat||40.7128, oLng=s.origin?.lng||-74.006;
+  const dLat=s.destination?.lat||34.0522, dLng=s.destination?.lng||-118.2437;
+  const creTs=getTs(s.createdAt)||Date.now()-864e5;
+  const etaTs=getTs(s.estimatedDelivery)||Date.now()+864e5;
+  const total=Math.max(1,etaTs-creTs);
+  const upd=()=>{
+    if(!A.movMarker||!A.mapInst) return;
+    const prog=Math.min(1,Math.max(0,(Date.now()-creTs)/total));
+    A.movMarker.setLatLng([oLat+(dLat-oLat)*prog, oLng+(dLng-oLng)*prog]);
+  };
+  upd(); A.mapTimer=setInterval(upd,5000);
+}
+
+/* ──────────────────────────────────────────────
+   12. ADMIN DASHBOARD
+   ────────────────────────────────────────────── */
+async function loadDash() {
+  try {
+    A.ships = await dbGetAll();
+    renderStats(); renderRecent(); renderAll();
+  } catch(e) { console.error(e); toast('error','Error','Failed to load shipments.'); }
+}
+function renderStats() {
+  const cnt={};
+  A.ships.forEach(s=>{ cnt[s.status]=(cnt[s.status]||0)+1; });
+  document.getElementById('admin-stats').innerHTML=[
+    {l:'Total',v:A.ships.length,      ic:'fa-boxes-stacked', bg:'#dbeafe',ic2:'#1d4ed8'},
+    {l:'In Transit',v:cnt['In Transit']||0,ic:'fa-truck',     bg:'#dbeafe',ic2:'#1d4ed8'},
+    {l:'On Hold',v:cnt['On Hold']||0,  ic:'fa-circle-pause',  bg:'#fee2e2',ic2:'#dc2626'},
+    {l:'Delivered',v:cnt['Delivered']||0,ic:'fa-circle-check',bg:'#dcfce7',ic2:'#15803d'},
+  ].map(s=>`<div class="stat-c">
+    <div class="stat-c-icon" style="background:${s.bg};color:${s.ic2};"><i class="fa-solid ${s.ic}"></i></div>
+    <div><h3>${s.v}</h3><p>${s.l}</p></div>
+  </div>`).join('');
+}
+function renderRecent() {
+  document.getElementById('recent-tbody').innerHTML =
+    A.ships.slice(0,5).map(s=>rowShort(s)).join('') ||
+    `<tr><td colspan="5"><div class="empty"><div class="empty-icon"><i class="fa-solid fa-inbox"></i></div><h3>No Shipments</h3><p>Create your first shipment.</p></div></td></tr>`;
+}
+function renderAll(list) {
+  list = list||A.ships;
+  document.getElementById('ship-count-l').textContent=`${list.length} shipment${list.length!==1?'s':''} found`;
+  document.getElementById('all-tbody').innerHTML =
+    list.map(s=>rowLong(s)).join('') ||
+    `<tr><td colspan="7"><div class="empty"><div class="empty-icon"><i class="fa-solid fa-magnifying-glass"></i></div><h3>No Results</h3><p>Try adjusting your search.</p></div></td></tr>`;
+}
+function rowShort(s) {
+  const eta=getTs(s.estimatedDelivery);
+  return `<tr>
+    <td class="tc-cell">${s.trackingCode}</td>
+    <td>${s.receiver?.name||'-'}</td>
+    <td>${badge(s.status)}</td>
+    <td style="font-size:12px;color:var(--text-2);">${eta?fmtD(eta):'N/A'}</td>
+    <td>${actionBtns(s)}</td>
+  </tr>`;
+}
+function rowLong(s) {
+  const eta=getTs(s.estimatedDelivery);
+  return `<tr>
+    <td class="tc-cell">${s.trackingCode}</td>
+    <td style="font-size:12px;">${s.sender?.name||'-'}</td>
+    <td style="font-size:12px;">${s.receiver?.name||'-'}</td>
+    <td style="font-size:11px;color:var(--text-3);">${s.origin?.name||'-'} → ${s.destination?.name||'-'}</td>
+    <td>${badge(s.status)}${s.holdReason?`<br><span style="font-size:10px;color:var(--red);">${s.holdReason}</span>`:''}</td>
+    <td style="font-size:12px;color:var(--text-2);">${eta?fmtD(eta):'N/A'}</td>
+    <td>${actionBtns(s)}</td>
+  </tr>`;
+}
+function actionBtns(s) {
+  return `<div style="display:flex;gap:5px;flex-wrap:wrap;">
+    <button class="btn btn-sm btn-primary" onclick='viewShip("${s.id}")' title="View"><i class="fa-solid fa-eye"></i></button>
+    <button class="btn btn-sm btn-accent"  onclick='openMoEdit("${s.id}")' title="Update"><i class="fa-solid fa-pen"></i></button>
+    <button class="btn btn-sm btn-ghost"   onclick='go("track",{code:"${s.trackingCode}"})' title="Track"><i class="fa-solid fa-location-dot"></i></button>
+    <button class="btn btn-sm btn-danger"  onclick='openMoDel("${s.id}","${s.trackingCode}")' title="Delete"><i class="fa-solid fa-trash"></i></button>
+  </div>`;
+}
+function filterShips() {
+  const q=document.getElementById('s-search').value.toLowerCase();
+  const st=document.getElementById('s-filter').value;
+  renderAll(A.ships.filter(s=>{
+    const mq=!q||[s.trackingCode,s.sender?.name,s.receiver?.name,s.status,s.packageDescription].some(v=>v?.toLowerCase().includes(q));
+    const ms=!st||s.status===st;
+    return mq&&ms;
+  }));
+}
+function showTab(t) {
+  ['overview','shipments','create'].forEach(n=>{
+    document.getElementById('atab-'+n).style.display=n===t?'block':'none';
+    const el=document.getElementById('tab-'+n);
+    if(el) el.classList.toggle('active',n===t);
+  });
+  if(t==='create'&&!document.getElementById('f-eid').value) {
+    resetForm();
+    document.getElementById('f-code').value=genCode();
+    document.getElementById('create-title').textContent='Create New Shipment';
+    document.getElementById('submit-lbl').textContent='Create Shipment';
+  }
+}
+
+/* ──────────────────────────────────────────────
+   13. CREATE / EDIT FORM
+   ────────────────────────────────────────────── */
+function onStatusChange() {
+  document.getElementById('hold-f-field').style.display=document.getElementById('f-status').value==='On Hold'?'block':'none';
+}
+function resetForm() {
+  ['f-desc','f-sn','f-sp','f-se','f-sa','f-rn','f-rp','f-re','f-ra',
+   'f-on','f-dn','f-oc','f-dc','f-cl','f-cc','f-hold','f-tmsg','f-eid'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  document.getElementById('f-status').value='Pending';
+  document.getElementById('hold-f-field').style.display='none';
+  document.getElementById('form-err').style.display='none';
+  const d7=new Date(Date.now()+7*864e5);
+  document.getElementById('f-eta').value=toLocal(d7);
+}
+function parseCoords(str) {
+  if(!str) return null;
+  const p=str.split(',').map(s=>parseFloat(s.trim()));
+  if(p.length!==2||isNaN(p[0])||isNaN(p[1])) return null;
+  return {lat:p[0],lng:p[1]};
+}
+function validateForm() {
+  const req={
+    'f-desc':'Package description','f-eta':'Estimated delivery',
+    'f-sn':'Sender name','f-sp':'Sender phone','f-se':'Sender email','f-sa':'Sender address',
+    'f-rn':'Receiver name','f-rp':'Receiver phone','f-re':'Receiver email','f-ra':'Receiver address',
+    'f-on':'Origin name','f-dn':'Destination name','f-oc':'Origin coordinates','f-dc':'Destination coordinates',
+    'f-tmsg':'Timeline message'
+  };
+  for(const [id,lbl] of Object.entries(req)) {
+    if(!document.getElementById(id).value.trim()) return lbl+' is required.';
+  }
+  if(document.getElementById('f-status').value==='On Hold'&&!document.getElementById('f-hold').value.trim())
+    return 'Hold reason is required when status is On Hold.';
+  if(!parseCoords(document.getElementById('f-oc').value)) return 'Origin coordinates must be: lat, lng (e.g. 40.71, -74.00)';
+  if(!parseCoords(document.getElementById('f-dc').value)) return 'Destination coordinates must be: lat, lng';
+  return null;
+}
+async function submitShipment() {
+  const err=validateForm();
+  const errEl=document.getElementById('form-err');
+  if(err){ errEl.textContent=err; errEl.style.display='block'; errEl.scrollIntoView({behavior:'smooth',block:'center'}); return; }
+  errEl.style.display='none';
+  const btn=document.getElementById('submit-btn'); btn.classList.add('btn-loading'); btn.disabled=true;
+  const status=document.getElementById('f-status').value;
+  const eta=new Date(document.getElementById('f-eta').value);
+  const isHold=status==='On Hold';
+  const oC=parseCoords(document.getElementById('f-oc').value);
+  const dC=parseCoords(document.getElementById('f-dc').value);
+  const cC=parseCoords(document.getElementById('f-cc').value)||oC;
+  const tlEntry={status,message:document.getElementById('f-tmsg').value.trim(),timestamp:new Date()};
+  const editId=document.getElementById('f-eid').value;
+  try {
+    if(editId) {
+      const ex=A.ships.find(s=>s.id===editId);
+      await dbUpdate(editId,{
+        packageDescription:document.getElementById('f-desc').value.trim(), status,
+        holdReason:isHold?document.getElementById('f-hold').value.trim():'',
+        remainingTime:isHold?Math.max(0,eta.getTime()-Date.now()):null,
+        estimatedDelivery:eta,
+        sender:{name:g('f-sn'),phone:g('f-sp'),email:g('f-se'),address:g('f-sa')},
+        receiver:{name:g('f-rn'),phone:g('f-rp'),email:g('f-re'),address:g('f-ra')},
+        origin:{name:g('f-on'),...oC}, destination:{name:g('f-dn'),...dC},
+        currentLocation:{label:g('f-cl'),...cC},
+        timeline:[...(ex?.timeline||[]),tlEntry],
+      });
+      toast('success','Updated',document.getElementById('f-code').value+' saved.');
+    } else {
+      await dbCreate({
+        trackingCode:document.getElementById('f-code').value,
+        packageDescription:g('f-desc'), status,
+        holdReason:isHold?g('f-hold'):'',
+        remainingTime:isHold?Math.max(0,eta.getTime()-Date.now()):null,
+        estimatedDelivery:eta, createdAt:new Date(),
+        sender:{name:g('f-sn'),phone:g('f-sp'),email:g('f-se'),address:g('f-sa')},
+        receiver:{name:g('f-rn'),phone:g('f-rp'),email:g('f-re'),address:g('f-ra')},
+        origin:{name:g('f-on'),...oC}, destination:{name:g('f-dn'),...dC},
+        currentLocation:{label:g('f-cl')||g('f-on'),...cC},
+        timeline:[tlEntry],
+      });
+      toast('success','Created',document.getElementById('f-code').value+' created.');
+    }
+    A.ships=await dbGetAll(); renderStats(); renderRecent(); renderAll(); resetForm(); showTab('shipments');
+  } catch(e){ toast('error','Error','Save failed: '+e.message); }
+  finally{ btn.classList.remove('btn-loading'); btn.disabled=false; }
+}
+function g(id){ return document.getElementById(id)?.value.trim()||''; }
+
+/* ──────────────────────────────────────────────
+   14. EDIT MODAL (QUICK UPDATE)
+   ────────────────────────────────────────────── */
+function openMoEdit(id) {
+  const s=A.ships.find(x=>x.id===id); if(!s) return;
+  A.editId=id;
+  document.getElementById('mo-code').textContent=s.trackingCode;
+  document.getElementById('mo-status').value=s.status;
+  document.getElementById('mo-hold').value=s.holdReason||'';
+  document.getElementById('mo-cl').value=s.currentLocation?.label||'';
+  document.getElementById('mo-cc').value=s.currentLocation?`${s.currentLocation.lat},${s.currentLocation.lng}`:'';
+  document.getElementById('mo-tmsg').value='';
+  onMoStatusChange();
+  document.getElementById('mo-edit').classList.add('show');
+}
+function onMoStatusChange() {
+  const nst=document.getElementById('mo-status').value;
+  const prev=(A.ships.find(s=>s.id===A.editId)||{}).status;
+  document.getElementById('mo-hold-f').style.display    = nst==='On Hold'?'block':'none';
+  document.getElementById('mo-resume-info').style.display= prev==='On Hold'&&nst!=='On Hold'?'block':'none';
+}
+async function saveMoUpdate() {
+  const id=A.editId, s=A.ships.find(x=>x.id===id); if(!s) return;
+  const nst=document.getElementById('mo-status').value;
+  const hold=document.getElementById('mo-hold').value.trim();
+  const cl=document.getElementById('mo-cl').value.trim();
+  const cc=document.getElementById('mo-cc').value.trim();
+  const msg=document.getElementById('mo-tmsg').value.trim();
+  if(!msg){ toast('warning','Required','Please enter a timeline message.'); return; }
+  if(nst==='On Hold'&&!hold){ toast('warning','Required','Hold reason is required.'); return; }
+  const btn=document.getElementById('mo-save-btn'); btn.classList.add('btn-loading'); btn.disabled=true;
+  const now=Date.now();
+  const etaTs=getTs(s.estimatedDelivery)||now+864e5;
+  const wasHold=s.status==='On Hold', nowHold=nst==='On Hold';
+  let estimatedDelivery=s.estimatedDelivery, remainingTime=s.remainingTime;
+  if(nowHold&&!wasHold)   { remainingTime=Math.max(0,etaTs-now); }
+  if(!nowHold&&wasHold)   { const rt=s.remainingTime||Math.max(0,etaTs-now); estimatedDelivery=new Date(now+rt); remainingTime=null; }
+  const curCoords=parseCoords(cc)||{lat:s.currentLocation?.lat,lng:s.currentLocation?.lng};
+  try {
+    await dbUpdate(id,{
+      status:nst, holdReason:nowHold?hold:'',
+      remainingTime, estimatedDelivery,
+      currentLocation:{label:cl,...curCoords},
+      timeline:[...(s.timeline||[]),{status:nst,message:msg,timestamp:new Date()}],
+    });
+    A.ships=await dbGetAll(); renderStats(); renderRecent(); renderAll(); closeMo('mo-edit');
+    toast('success','Updated',`Status → ${nst}.${(!nowHold&&wasHold)?' ETA recalculated.':''}`);
+  } catch(e){ toast('error','Error','Update failed.'); }
+  finally{ btn.classList.remove('btn-loading'); btn.disabled=false; }
+}
+
+/* ──────────────────────────────────────────────
+   15. VIEW MODAL
+   ────────────────────────────────────────────── */
+function viewShip(id) {
+  const s=A.ships.find(x=>x.id===id); if(!s) return;
+  const eta=getTs(s.estimatedDelivery), cre=getTs(s.createdAt);
+  const tlHTML=(s.timeline||[]).slice().reverse().map(e=>{
+    const sc=STATUS[e.status]||STATUS['Pending'], ts=getTs(e.timestamp);
+    return `<div style="display:flex;gap:11px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border);">
+      <div style="width:30px;height:30px;background:${sc.col};border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <i class="fa-solid ${sc.icon}" style="color:white;font-size:12px;"></i>
+      </div>
+      <div><div style="font-weight:700;font-size:13px;">${e.status}</div>
+        <div style="font-size:12px;color:var(--text-2);">${e.message}</div>
+        <div style="font-size:11px;color:var(--text-3);margin-top:2px;">${fmtDT(ts)}</div>
+      </div></div>`;
+  }).join('');
+  document.getElementById('mo-view-body').innerHTML=`
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+      ${badge(s.status)}
+      <code style="font-size:13px;color:var(--primary);font-weight:700;">${s.trackingCode}</code>
+    </div>
+    <p style="font-weight:700;font-size:15px;margin-bottom:3px;">${s.packageDescription||'-'}</p>
+    <p style="font-size:12px;color:var(--text-2);margin-bottom:16px;">${s.origin?.name||'-'} → ${s.destination?.name||'-'}</p>
+    ${s.holdReason?`<div class="hold-banner" style="margin-bottom:16px;"><i class="fa-solid fa-circle-pause"></i><span>On Hold: ${s.holdReason}</span></div>`:''}
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px;font-size:13px;">
+      <div><div class="ig-l">Sender</div><div class="ig-v">${s.sender?.name||'-'}</div><div class="ig-sub">${s.sender?.email||''}</div></div>
+      <div><div class="ig-l">Receiver</div><div class="ig-v">${s.receiver?.name||'-'}</div><div class="ig-sub">${s.receiver?.email||''}</div></div>
+      <div><div class="ig-l">Created</div><div class="ig-v" style="font-size:13px;">${fmtDT(cre)}</div></div>
+      <div><div class="ig-l">ETA</div><div class="ig-v" style="font-size:13px;">${eta?fmtDT(eta):'N/A'}</div></div>
+    </div>
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text-3);margin-bottom:10px;">Timeline</div>
+    ${tlHTML||'<p style="color:var(--text-3);font-size:13px;">No entries.</p>'}
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px;padding-top:14px;border-top:1px solid var(--border);">
+      <button class="btn btn-accent btn-sm" onclick='openMoEdit("${s.id}");closeMo("mo-view");'><i class="fa-solid fa-pen"></i> Update</button>
+      <button class="btn btn-primary btn-sm" onclick='go("track",{code:"${s.trackingCode}"});closeMo("mo-view");'><i class="fa-solid fa-location-dot"></i> Track</button>
+    </div>`;
+  document.getElementById('mo-view').classList.add('show');
+}
+
+/* ──────────────────────────────────────────────
+   16. DELETE
+   ────────────────────────────────────────────── */
+function openMoDel(id,code){ A.delId=id; A.delCode=code; document.getElementById('del-code').textContent=code; document.getElementById('mo-del').classList.add('show'); }
+async function confirmDel() {
+  const btn=document.getElementById('del-confirm-btn'); btn.classList.add('btn-loading'); btn.disabled=true;
+  try {
+    await dbDelete(A.delId);
+    A.ships=await dbGetAll(); renderStats(); renderRecent(); renderAll(); closeMo('mo-del');
+    toast('success','Deleted',A.delCode+' deleted.');
+  } catch(e){ toast('error','Error','Delete failed.'); }
+  finally{ btn.classList.remove('btn-loading'); btn.disabled=false; }
+}
+
+/* ──────────────────────────────────────────────
+   17. CONTACT
+   ────────────────────────────────────────────── */
+function submitContact() {
+  const fn=document.getElementById('c-fn').value.trim();
+  const ln=document.getElementById('c-ln').value.trim();
+  const em=document.getElementById('c-em').value.trim();
+  const mg=document.getElementById('c-msg').value.trim();
+  if(!fn||!ln||!em||!mg){ toast('warning','Required','Please fill in all required fields.'); return; }
+  if(!/^[^@]+@[^@]+\.[^@]+$/.test(em)){ toast('warning','Invalid email','Please enter a valid email address.'); return; }
+  ['c-fn','c-ln','c-em','c-ph','c-msg'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  toast('success','Message Sent!','Thank you! We\'ll respond within 24 hours.',5000);
+}
+
+/* ──────────────────────────────────────────────
+   18. NAV HELPERS
+   ────────────────────────────────────────────── */
+function toggleMob(){ document.getElementById('mob-menu').classList.toggle('open'); }
+function closeMob(){ document.getElementById('mob-menu').classList.remove('open'); }
+function closeMo(id){ document.getElementById(id).classList.remove('show'); }
+document.querySelectorAll('.mo').forEach(m=>m.addEventListener('click',e=>{ if(e.target===m) m.classList.remove('show'); }));
+
+/* ──────────────────────────────────────────────
+   19. TOAST
+   ────────────────────────────────────────────── */
+function toast(type,title,msg,dur=4000){
+  const icons={success:'fa-check-circle',error:'fa-times-circle',warning:'fa-exclamation-triangle',info:'fa-info-circle'};
+  const el=document.createElement('div');
+  el.className=`toast ${type}`;
+  el.innerHTML=`<i class="fa-solid ${icons[type]||icons.info} toast-icon"></i>
+    <div><div class="toast-t">${title}</div>${msg?`<div class="toast-m">${msg}</div>`:''}</div>
+    <button class="toast-x" onclick="this.parentElement.remove()"><i class="fa-solid fa-xmark"></i></button>`;
+  document.getElementById('toast-wrap').appendChild(el);
+  setTimeout(()=>{ el.style.animation='slideRight .3s ease reverse'; setTimeout(()=>el.remove(),300); },dur);
+}
+
+/* ──────────────────────────────────────────────
+   20. DATE UTILS
+   ────────────────────────────────────────────── */
+function getTs(v){
+  if(!v) return null;
+  if(v instanceof Date) return v.getTime();
+  if(typeof v==='number') return v;
+  if(v?.toMillis) return v.toMillis();
+  if(v?.seconds) return v.seconds*1000;
+  try{ return new Date(v).getTime(); }catch{ return null; }
+}
+function fmtD(ts){ return ts?new Date(ts).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'N/A'; }
+function fmtDT(ts){ return ts?new Date(ts).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'}):'N/A'; }
+function toLocal(d){ const o=d.getTimezoneOffset(); return new Date(d.getTime()-o*60000).toISOString().slice(0,16); }
+
+/* ──────────────────────────────────────────────
+   21. BOOT
+   ────────────────────────────────────────────── */
+(function boot(){
+  const fbOk = loadCfg();
+  if(fbOk){
+    A.demo=false; setupAuthListener();
+    setTimeout(()=>toast('info','Firebase Ready','Connected to your Firestore database.',4000),800);
+  } else {
+    A.demo=true; A.ships=[...DEMO];
+    A.user=null; updateNav(null);          // ← no auto-login; admin requires credentials
+    setTimeout(()=>toast('info','Demo Mode',
+      'Public tracking uses sample data. Admin: admin@demo.com / demo1234',8000),1000);
+  }
+  go('home');
+})();
+</script>
+</body>
+</html>
