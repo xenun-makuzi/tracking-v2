@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>XTracking v2 | Global Logistics Platform</title>
+<title>FirstChoiceLogistics | Global Logistics Platform</title>
 
 <!-- Firebase SDK (Compat) -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -97,11 +97,6 @@ input, select, textarea { font-family: inherit; }
   font-size: 21px; font-weight: 800; color: white; letter-spacing: -.5px;
 }
 .nav-brand-name em { color: var(--accent); font-style: normal; }
-.nav-brand-ver {
-  font-size: 10px; font-weight: 600; color: rgba(255,255,255,.4);
-  background: rgba(255,255,255,.08); border-radius: 4px;
-  padding: 2px 6px; margin-left: -4px; align-self: flex-start; margin-top: 4px;
-}
 .nav-links { display: flex; align-items: center; gap: 4px; list-style: none; }
 .nav-links a {
   display: block; padding: 7px 13px; border-radius: 8px;
@@ -342,29 +337,6 @@ tbody tr:hover { background: #f7f9fc; }
   color: var(--text); margin-bottom: 10px;
 }
 .sec-hd p { font-size: 16px; color: var(--text-2); max-width: 520px; margin: 0 auto; }
-
-/* ============================================================
-   SETUP MODAL (full-screen)
-   ============================================================ */
-#setup-overlay {
-  position: fixed; inset: 0; z-index: 99999;
-  background: rgba(10,22,40,.96);
-  display: none; align-items: center; justify-content: center; padding: 20px;
-}
-#setup-overlay.show { display: flex; }
-.setup-box {
-  background: var(--surface); border-radius: var(--r-xl);
-  width: 100%; max-width: 580px; max-height: 92vh;
-  overflow-y: auto; box-shadow: var(--shadow-l);
-}
-.setup-progress { display: flex; gap: 0; border-radius: 3px; overflow: hidden; margin-bottom: 28px; }
-.sp { flex: 1; height: 4px; background: var(--border); transition: background .3s; }
-.sp.done { background: var(--green); }
-.sp.active { background: var(--primary); }
-.setup-info { background: #dbeafe; border-radius: var(--r-s); padding: 14px 16px; margin-bottom: 22px; }
-.setup-info p { font-size: 13px; color: #1d4ed8; font-weight: 500; }
-.setup-success { background: #dcfce7; border-radius: var(--r-s); padding: 14px 16px; margin-bottom: 22px; }
-.setup-success p { font-size: 13px; color: #15803d; font-weight: 500; }
 
 /* ============================================================
    HOME PAGE
@@ -759,66 +731,13 @@ footer { background: var(--navy); color: rgba(255,255,255,.6); padding: 60px 28p
 <body>
 
 <!-- ====================================================
-     SETUP OVERLAY
-     ==================================================== -->
-<div id="setup-overlay">
-  <div class="setup-box">
-    <div class="mo-hd">
-      <div class="mo-title">
-        <div style="width:32px;height:32px;background:var(--navy);border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-size:15px;">
-          <i class="fa-solid fa-truck-fast"></i>
-        </div>
-        XTracking v2 — Firebase Setup
-      </div>
-    </div>
-    <div class="mo-bd">
-      <!-- Step 1: Firebase Config -->
-      <div id="setup-s1">
-        <div class="setup-progress"><div class="sp active"></div><div class="sp"></div></div>
-        <div class="setup-info">
-          <p><i class="fa-solid fa-circle-info"></i> &nbsp;Go to <strong>Firebase Console → Project Settings → Your Apps</strong> and copy your config below.</p>
-        </div>
-        <div class="f-row">
-          <div class="fg"><label class="fl">API Key *</label><input id="fb-key" class="fi" placeholder="AIzaSy..."/></div>
-          <div class="fg"><label class="fl">Auth Domain *</label><input id="fb-auth" class="fi" placeholder="project.firebaseapp.com"/></div>
-        </div>
-        <div class="f-row">
-          <div class="fg"><label class="fl">Project ID *</label><input id="fb-proj" class="fi" placeholder="my-project"/></div>
-          <div class="fg"><label class="fl">Storage Bucket</label><input id="fb-store" class="fi" placeholder="project.appspot.com"/></div>
-        </div>
-        <div class="f-row">
-          <div class="fg"><label class="fl">Messaging Sender ID</label><input id="fb-msg" class="fi" placeholder="123456789"/></div>
-          <div class="fg"><label class="fl">App ID *</label><input id="fb-app" class="fi" placeholder="1:xxx:web:xxx"/></div>
-        </div>
-        <div id="setup-err1" style="color:var(--red);font-size:13px;margin-top:-4px;display:none;padding:10px 14px;background:#fee2e2;border-radius:8px;"></div>
-      </div>
-      <!-- Step 2: Admin Account -->
-      <div id="setup-s2" style="display:none;">
-        <div class="setup-progress"><div class="sp done"></div><div class="sp active"></div></div>
-        <div class="setup-success"><p><i class="fa-solid fa-check-circle"></i> &nbsp;Firebase connected! Now create your admin account.</p></div>
-        <div class="fg"><label class="fl">Admin Email *</label><input type="email" id="admin-em" class="fi" placeholder="admin@company.com"/></div>
-        <div class="fg"><label class="fl">Password (min 6 chars) *</label><input type="password" id="admin-pw" class="fi" placeholder="••••••••"/></div>
-        <div class="fg"><label class="fl">Confirm Password *</label><input type="password" id="admin-pw2" class="fi" placeholder="••••••••"/></div>
-        <div id="setup-err2" style="color:var(--red);font-size:13px;margin-top:-4px;display:none;padding:10px 14px;background:#fee2e2;border-radius:8px;"></div>
-        <p style="font-size:12px;color:var(--text-3);margin-top:8px;">Add more admin accounts later via Firebase Console → Authentication.</p>
-      </div>
-    </div>
-    <div class="mo-ft" style="justify-content:space-between;">
-      <button id="setup-demo-btn" class="btn btn-ghost"><i class="fa-solid fa-flask"></i> Use Demo Mode</button>
-      <button id="setup-next-btn" class="btn btn-primary">Connect Firebase <i class="fa-solid fa-arrow-right"></i></button>
-    </div>
-  </div>
-</div>
-
-<!-- ====================================================
      NAVIGATION
      ==================================================== -->
 <nav class="nav" style="position:relative;">
   <div class="nav-inner">
     <div class="nav-brand" onclick="go('home')">
       <div class="nav-brand-icon"><i class="fa-solid fa-truck-fast"></i></div>
-      <span class="nav-brand-name">X<em>Tracking</em></span>
-      <span class="nav-brand-ver">v2</span>
+      <span class="nav-brand-name">FirstChoice<em>Logistics</em></span>
     </div>
     <ul class="nav-links" id="nav-links">
       <li><a data-page="home"      onclick="go('home')">Home</a></li>
@@ -867,7 +786,7 @@ footer { background: var(--navy); color: rgba(255,255,255,.6); padding: 60px 28p
       <p>Enterprise-grade shipment management with real-time GPS simulation, smart ETA engine, and full lifecycle control.</p>
       <div class="hero-track">
         <i class="fa-solid fa-barcode" style="color:var(--text-3);padding:0 4px 0 14px;font-size:17px;"></i>
-        <input id="hero-inp" type="text" placeholder="Enter tracking code  (e.g. XTR-DEMO01)" maxlength="20" autocomplete="off"/>
+        <input id="hero-inp" type="text" placeholder="Enter tracking code  (e.g. FCL-ABC123)" maxlength="20" autocomplete="off"/>
         <button class="btn btn-accent" onclick="trackFromHero()">Track Now</button>
       </div>
       <p class="hero-hint">
@@ -897,7 +816,7 @@ footer { background: var(--navy); color: rgba(255,255,255,.6); padding: 60px 28p
   <!-- Features -->
   <section class="features-sec">
     <div class="sec-hd">
-      <div class="sec-label">Why XTracking</div>
+      <div class="sec-label">Why FirstChoiceLogistics</div>
       <h2>Built for Modern Logistics</h2>
       <p>Everything you need to manage, track, and deliver with total confidence and transparency.</p>
     </div>
@@ -938,7 +857,7 @@ footer { background: var(--navy); color: rgba(255,255,255,.6); padding: 60px 28p
   <!-- CTA -->
   <div class="cta-strip">
     <h2>Ready to Ship Smarter?</h2>
-    <p>Join thousands of businesses that trust XTracking for mission-critical logistics.</p>
+    <p>Join thousands of businesses that trust FirstChoiceLogistics for mission-critical logistics.</p>
     <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
       <button class="btn btn-accent btn-xl" onclick="go('contact')">Get Started Today</button>
       <button class="btn btn-xl" style="background:rgba(255,255,255,.1);color:white;border:1px solid rgba(255,255,255,.2);" onclick="go('services')">View Services</button>
@@ -1045,7 +964,7 @@ footer { background: var(--navy); color: rgba(255,255,255,.6); padding: 60px 28p
     <div class="auth-card">
       <div class="auth-logo">
         <div class="auth-logo-icon"><i class="fa-solid fa-truck-fast"></i></div>
-        <div class="auth-logo-name">X<em>Tracking</em></div>
+        <div class="auth-logo-name">FirstChoice<em>Logistics</em></div>
       </div>
       <div class="auth-title">Admin Login</div>
       <div class="auth-sub">Sign in to access the logistics dashboard</div>
@@ -1065,16 +984,10 @@ footer { background: var(--navy); color: rgba(255,255,255,.6); padding: 60px 28p
       </div>
       <div id="l-err" style="color:var(--red);font-size:13px;min-height:20px;margin-bottom:14px;"></div>
       <button class="btn btn-primary btn-block" id="l-btn" onclick="doLogin()"><i class="fa-solid fa-sign-in-alt"></i> Sign In</button>
-      <!-- Demo credentials hint (hidden in Firebase mode) -->
-      <div id="demo-hint" style="margin-top:18px;background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:13px 15px;">
-        <p style="font-size:12px;font-weight:700;color:#c2410c;margin-bottom:4px;"><i class="fa-solid fa-flask"></i> Demo Mode Credentials</p>
-        <p style="font-size:12px;color:#9a3412;">Email: <code style="background:#fee2e2;padding:2px 6px;border-radius:4px;">admin@demo.com</code></p>
-        <p style="font-size:12px;color:#9a3412;margin-top:3px;">Password: <code style="background:#fee2e2;padding:2px 6px;border-radius:4px;">demo1234</code></p>
-      </div>
       <hr class="divider"/>
       <p style="font-size:13px;color:var(--text-2);text-align:center;">
-        No Firebase setup yet?
-        <a onclick="showSetup()" style="color:var(--primary);font-weight:700;cursor:pointer;">Configure Firebase</a>
+        Need to create an admin account?
+        <a href="https://console.firebase.google.com" target="_blank" style="color:var(--primary);font-weight:700;">Firebase Console →</a>
       </p>
     </div>
   </div>
@@ -1162,7 +1075,7 @@ footer { background: var(--navy); color: rgba(255,255,255,.6); padding: 60px 28p
               <input type="text" id="f-code" class="fi" readonly style="background:var(--bg);font-family:monospace;font-weight:700;color:var(--primary);"/>
               <input type="hidden" id="f-eid"/>
             </div>
-            <div class="fg"><label class="fl">Package Description *</label><input type="text" id="f-desc" class="fi" placeholder="e.g. Electronics — Laptop 16""/></div>
+            <div class="fg"><label class="fl">Package Description *</label><input type="text" id="f-desc" class="fi" placeholder="e.g. Electronics — Laptop 16&quot;"/></div>
           </div>
           <div class="f-row">
             <div class="fg"><label class="fl">Estimated Delivery *</label><input type="datetime-local" id="f-eta" class="fi"/></div>
@@ -1242,7 +1155,7 @@ footer { background: var(--navy); color: rgba(255,255,255,.6); padding: 60px 28p
 <div id="pg-about" class="page">
   <div class="about-hero">
     <div class="sec-label" style="background:rgba(249,115,22,.15);color:#fdba74;">Our Story</div>
-    <h1>About XTracking</h1>
+    <h1>About FirstChoiceLogistics</h1>
     <p>Pioneering the future of global logistics through technology, trust, and radical transparency.</p>
   </div>
   <div class="content-wrap">
@@ -1251,7 +1164,7 @@ footer { background: var(--navy); color: rgba(255,255,255,.6); padding: 60px 28p
       <div>
         <div class="sec-label">Founded 2015</div>
         <h2 style="font-family:'Syne',sans-serif;font-size:clamp(26px,3vw,36px);font-weight:800;letter-spacing:-1px;margin:10px 0 18px;">Delivering Trust Since Day One</h2>
-        <p style="color:var(--text-2);line-height:1.8;margin-bottom:14px;">XTracking was founded on a single belief: logistics should be transparent, reliable, and stress-free for everyone involved — sender, receiver, and operator alike.</p>
+        <p style="color:var(--text-2);line-height:1.8;margin-bottom:14px;">FirstChoiceLogistics was founded on a single belief: logistics should be transparent, reliable, and stress-free for everyone involved — sender, receiver, and operator alike.</p>
         <p style="color:var(--text-2);line-height:1.8;margin-bottom:14px;">What started as a small regional courier tracker has grown into an enterprise-grade global platform trusted by thousands of businesses across 150+ countries.</p>
         <p style="color:var(--text-2);line-height:1.8;">Our team of engineers, logistics experts, and customer success specialists work around the clock to ensure every package reaches its destination — on time, every time.</p>
       </div>
@@ -1302,7 +1215,7 @@ footer { background: var(--navy); color: rgba(255,255,255,.6); padding: 60px 28p
     <!-- Team -->
     <div class="sec-hd" style="margin-top:20px;">
       <div class="sec-label">The Team</div>
-      <h2>People Behind XTracking</h2>
+      <h2>People Behind FirstChoiceLogistics</h2>
       <p>Driven by passion for logistics, technology, and customer delight.</p>
     </div>
     <div class="team-grid">
@@ -1348,7 +1261,6 @@ footer { background: var(--navy); color: rgba(255,255,255,.6); padding: 60px 28p
     <p>From same-day local delivery to complex international freight — we have the expertise and infrastructure to handle it all.</p>
   </div>
   <div class="services-content">
-    <!-- Services Grid -->
     <div class="sec-hd">
       <div class="sec-label">Our Services</div>
       <h2>Choose Your Shipping Solution</h2>
@@ -1458,7 +1370,7 @@ footer { background: var(--navy); color: rgba(255,255,255,.6); padding: 60px 28p
         </div>
         <div class="ci-item">
           <div class="ci-icon"><i class="fa-solid fa-envelope"></i></div>
-          <div class="ci-text"><h4>Email</h4><p>support@xtracking.com<br>sales@xtracking.com</p></div>
+          <div class="ci-text"><h4>Email</h4><p>support@firstchoicelogistics.com<br>sales@firstchoicelogistics.com</p></div>
         </div>
         <div class="ci-item">
           <div class="ci-icon"><i class="fa-solid fa-clock"></i></div>
@@ -1466,12 +1378,12 @@ footer { background: var(--navy); color: rgba(255,255,255,.6); padding: 60px 28p
         </div>
         <div class="ci-item">
           <div class="ci-icon"><i class="fa-brands fa-whatsapp"></i></div>
-          <div class="ci-text"><h4>WhatsApp Business</h4><p>+1 (800) 987-XTRK<br><span style="font-size:12px;color:var(--text-3);">Instant replies guaranteed</span></p></div>
+          <div class="ci-text"><h4>WhatsApp Business</h4><p>+1 (800) 987-SWFT<br><span style="font-size:12px;color:var(--text-3);">Instant replies guaranteed</span></p></div>
         </div>
         <div class="emerg-box">
           <h4>🚨 Emergency Shipment?</h4>
           <p>For urgent lost or damaged shipment issues, call our priority line:</p>
-          <div class="emerg-num">+1 (800) 111-XTRK</div>
+          <div class="emerg-num">+1 (800) 111-SWFT</div>
         </div>
       </div>
       <!-- Form Column -->
@@ -1492,7 +1404,7 @@ footer { background: var(--navy); color: rgba(255,255,255,.6); padding: 60px 28p
               <option>Technical Support</option><option>Partnership</option><option>Other</option>
             </select>
           </div>
-          <div class="fg"><label class="fl">Tracking Code (optional)</label><input type="text" id="c-tc" class="fi" placeholder="XTR-XXXXXX"/></div>
+          <div class="fg"><label class="fl">Tracking Code (optional)</label><input type="text" id="c-tc" class="fi" placeholder="FCL-XXXXXX"/></div>
           <div class="fg"><label class="fl">Message *</label><textarea id="c-msg" class="fta" placeholder="Tell us how we can help you…"></textarea></div>
           <button class="btn btn-accent btn-block" onclick="submitContact()"><i class="fa-solid fa-paper-plane"></i> Send Message</button>
           <p style="font-size:12px;color:var(--text-3);text-align:center;margin-top:12px;"><i class="fa-solid fa-lock"></i> Your data is secure. We never share your information.</p>
@@ -1580,7 +1492,7 @@ footer { background: var(--navy); color: rgba(255,255,255,.6); padding: 60px 28p
 <footer>
   <div class="footer-grid">
     <div class="ft-brand">
-      <h3>X<em>Tracking</em> v2</h3>
+      <h3>FirstChoice<em>Logistics</em></h3>
       <p>Enterprise logistics tracking platform with real-time GPS simulation, Firebase persistence, smart ETA engine, and full admin control.</p>
     </div>
     <div class="ft-col">
@@ -1612,11 +1524,33 @@ footer { background: var(--navy); color: rgba(255,255,255,.6); padding: 60px 28p
     </div>
   </div>
   <div class="ft-bottom">
-    <span>© 2025 XTracking v2. All rights reserved.</span>
+    <span>© 2025 FirstChoiceLogistics. All rights reserved.</span>
     <span style="color:rgba(255,255,255,.3);">Firebase · Leaflet.js · DM Sans · Syne</span>
   </div>
 </footer>
-
+<!-- WhatsApp Support Button -->
+<a href="https://wa.me/16892890743" target="_blank" rel="noopener noreferrer"
+   style="
+     position: fixed;
+     bottom: 28px;
+     left: 28px;
+     z-index: 9998;
+     width: 56px;
+     height: 56px;
+     background: #25D366;
+     border-radius: 50%;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     box-shadow: 0 4px 20px rgba(37,211,102,.45);
+     transition: transform .2s ease, box-shadow .2s ease;
+     text-decoration: none;
+   "
+   onmouseover="this.style.transform='scale(1.1)';this.style.boxShadow='0 6px 28px rgba(37,211,102,.6)'"
+   onmouseout="this.style.transform='scale(1)';this.style.boxShadow='0 4px 20px rgba(37,211,102,.45)'"
+   title="Chat with us on WhatsApp">
+  <i class="fa-brands fa-whatsapp" style="font-size:30px;color:white;"></i>
+</a>
 <!-- TOAST CONTAINER -->
 <div class="toast-wrap" id="toast-wrap"></div>
 
@@ -1631,7 +1565,7 @@ footer { background: var(--navy); color: rgba(255,255,255,.6); padding: 60px 28p
    ────────────────────────────────────────────── */
 const A = {
   db: null, auth: null, user: null,
-  demo: false, ships: [],
+  ships: [],
   etaTimer: null, mapTimer: null,
   mapInst: null, movMarker: null,
   editId: null, delId: null, delCode: null,
@@ -1647,264 +1581,109 @@ const STATUS = {
 };
 
 /* ──────────────────────────────────────────────
-   2.  DEMO DATA
+   2.  FIREBASE INIT (hardcoded credentials)
    ────────────────────────────────────────────── */
-const DEMO = [
-  {
-    id:'d1', trackingCode:'XTR-DEMO01',
-    packageDescription:'Electronics — MacBook Pro 16"',
-    status:'In Transit', holdReason:'',
-    sender:{ name:'TechCorp Inc.', address:'100 Broadway, New York, NY 10005', phone:'+1 212-555-0100', email:'shipping@techcorp.com' },
-    receiver:{ name:'Alice Johnson', address:'456 Sunset Blvd, Los Angeles, CA 90028', phone:'+1 323-555-0200', email:'alice@email.com' },
-    origin:{ name:'New York, USA', lat:40.7128, lng:-74.006 },
-    destination:{ name:'Los Angeles, USA', lat:34.0522, lng:-118.2437 },
-    currentLocation:{ label:'St. Louis Hub', lat:38.627, lng:-90.1994 },
-    timeline:[
-      { status:'Pending',    message:'Shipment created, awaiting pickup.',            timestamp:new Date(Date.now()-4*864e5) },
-      { status:'In Transit', message:'Picked up from origin. Heading to departure hub.',timestamp:new Date(Date.now()-3*864e5) },
-      { status:'In Transit', message:'Departed New York JFK — en route to Los Angeles.',timestamp:new Date(Date.now()-2*864e5) },
-      { status:'In Transit', message:'Arrived St. Louis Hub for sorting.',              timestamp:new Date(Date.now()-864e5) },
-    ],
-    createdAt:new Date(Date.now()-4*864e5),
-    estimatedDelivery:new Date(Date.now()+2*864e5),
-    remainingTime:null,
-  },
-  {
-    id:'d2', trackingCode:'XTR-DEMO02',
-    packageDescription:'Luxury Goods — Designer Handbag',
-    status:'On Hold', holdReason:'Customs inspection required at US border.',
-    sender:{ name:'LuxuryGoods Paris', address:'15 Rue de Rivoli, Paris, France', phone:'+33 1-555-0300', email:'export@luxgoods.fr' },
-    receiver:{ name:'Emma Williams', address:'789 Michigan Ave, Chicago, IL 60611', phone:'+1 312-555-0400', email:'emma@email.com' },
-    origin:{ name:'Paris, France', lat:48.8566, lng:2.3522 },
-    destination:{ name:'Chicago, USA', lat:41.8781, lng:-87.6298 },
-    currentLocation:{ label:'JFK Customs, New York', lat:40.6413, lng:-73.7781 },
-    timeline:[
-      { status:'Pending',        message:'Shipment created.',                      timestamp:new Date(Date.now()-7*864e5) },
-      { status:'In Transit',     message:'Departed Paris CDG Airport.',            timestamp:new Date(Date.now()-6*864e5) },
-      { status:'Arrived at Hub', message:'Arrived JFK International — hub intake.',timestamp:new Date(Date.now()-5*864e5) },
-      { status:'On Hold',        message:'Held for customs inspection — awaiting clearance.',timestamp:new Date(Date.now()-3*864e5) },
-    ],
-    createdAt:new Date(Date.now()-7*864e5),
-    estimatedDelivery:new Date(Date.now()+5*864e5),
-    remainingTime:5*864e5,
-  },
-  {
-    id:'d3', trackingCode:'XTR-DEMO03',
-    packageDescription:'Medical Supplies — Insulin Kit',
-    status:'Delivered', holdReason:'',
-    sender:{ name:'MedPharm Solutions', address:'555 Pharma Way, Houston, TX 77002', phone:'+1 713-555-0500', email:'dispatch@medpharm.com' },
-    receiver:{ name:'Dr. Carlos Rivera', address:'321 Health Blvd, Miami, FL 33101', phone:'+1 305-555-0600', email:'c.rivera@clinic.com' },
-    origin:{ name:'Houston, USA', lat:29.7604, lng:-95.3698 },
-    destination:{ name:'Miami, USA', lat:25.7617, lng:-80.1918 },
-    currentLocation:{ label:'Delivered to recipient', lat:25.7617, lng:-80.1918 },
-    timeline:[
-      { status:'Pending',          message:'Shipment created.',                          timestamp:new Date(Date.now()-5*864e5) },
-      { status:'In Transit',       message:'Package in transit via priority air freight.',timestamp:new Date(Date.now()-4*864e5) },
-      { status:'Arrived at Hub',   message:'Arrived Miami International Airport hub.',   timestamp:new Date(Date.now()-2*864e5) },
-      { status:'Out for Delivery', message:'Out for delivery in Miami.',                 timestamp:new Date(Date.now()-864e5) },
-      { status:'Delivered',        message:'Delivered and signed by Dr. Rivera.',        timestamp:new Date(Date.now()-432e5) },
-    ],
-    createdAt:new Date(Date.now()-5*864e5),
-    estimatedDelivery:new Date(Date.now()-432e5),
-    remainingTime:null,
-  },
-];
+const firebaseConfig = {
+  apiKey:            "AIzaSyABYx2IOl5ARfli0aO442JezcG_hTziYVg",
+  authDomain:        "swiftlogistics-41975.firebaseapp.com",
+  projectId:         "swiftlogistics-41975",
+  storageBucket:     "swiftlogistics-41975.firebasestorage.app",
+  messagingSenderId: "92242001554",
+  appId:             "1:92242001554:web:a1988ff15442e81c52304b"
+};
 
-/* ──────────────────────────────────────────────
-   3.  FIREBASE INIT
-   ────────────────────────────────────────────── */
-function initFB(cfg) {
+function initFB() {
   try {
-    if (firebase.apps.length) firebase.apps.forEach(ap => ap.delete());
-    firebase.initializeApp(cfg);
+    firebase.initializeApp(firebaseConfig);
     A.db   = firebase.firestore();
     A.auth = firebase.auth();
     return true;
-  } catch(e) { console.error(e); return false; }
+  } catch(e) { console.error('Firebase init error:', e); return false; }
 }
-function loadCfg() {
-  try {
-    const c = JSON.parse(localStorage.getItem('xt_fb_cfg') || '{}');
-    if (c.apiKey && c.projectId) { return initFB(c); }
-  } catch(e) {}
-  return false;
-}
-function saveCfg(c) { localStorage.setItem('xt_fb_cfg', JSON.stringify(c)); }
 
 /* ──────────────────────────────────────────────
-   4.  SETUP MODAL
-   ────────────────────────────────────────────── */
-let setupStep = 1;
-function showSetup() {
-  document.getElementById('setup-overlay').classList.add('show');
-  setupStep = 1; renderSetupStep();
-}
-function hideSetup() { document.getElementById('setup-overlay').classList.remove('show'); }
-function renderSetupStep() {
-  document.getElementById('setup-s1').style.display = setupStep===1 ? 'block':'none';
-  document.getElementById('setup-s2').style.display = setupStep===2 ? 'block':'none';
-  const btn = document.getElementById('setup-next-btn');
-  if (setupStep===1) { btn.innerHTML='Connect Firebase <i class="fa-solid fa-arrow-right"></i>'; btn.onclick=connectFB; }
-  else               { btn.innerHTML='<i class="fa-solid fa-user-plus"></i> Create Admin'; btn.onclick=createAdmin; }
-}
-async function connectFB() {
-  const cfg = {
-    apiKey:            document.getElementById('fb-key').value.trim(),
-    authDomain:        document.getElementById('fb-auth').value.trim(),
-    projectId:         document.getElementById('fb-proj').value.trim(),
-    storageBucket:     document.getElementById('fb-store').value.trim(),
-    messagingSenderId: document.getElementById('fb-msg').value.trim(),
-    appId:             document.getElementById('fb-app').value.trim(),
-  };
-  const errEl = document.getElementById('setup-err1');
-  if (!cfg.apiKey || !cfg.projectId || !cfg.appId) {
-    errEl.textContent='Please fill API Key, Project ID and App ID.'; errEl.style.display='block'; return;
-  }
-  const btn = document.getElementById('setup-next-btn');
-  btn.classList.add('btn-loading'); btn.disabled=true;
-  try {
-    if (!initFB(cfg)) throw new Error('Init failed');
-    // Test against shipments — public read is allowed by rules
-    await A.db.collection('shipments').limit(1).get();
-    saveCfg(cfg); A.demo=false; errEl.style.display='none';
-    setupStep=2; renderSetupStep();
-    setupAuthListener();
-  } catch(e) {
-    errEl.textContent='Connection failed: '+e.message; errEl.style.display='block';
-  } finally { btn.classList.remove('btn-loading'); btn.disabled=false; }
-}
-async function createAdmin() {
-  const em  = document.getElementById('admin-em').value.trim();
-  const pw  = document.getElementById('admin-pw').value;
-  const pw2 = document.getElementById('admin-pw2').value;
-  const errEl = document.getElementById('setup-err2');
-  if (!em||!pw)            { errEl.textContent='Email and password required.';    errEl.style.display='block'; return; }
-  if (pw.length < 6)       { errEl.textContent='Password min 6 chars.';          errEl.style.display='block'; return; }
-  if (pw !== pw2)          { errEl.textContent='Passwords do not match.';        errEl.style.display='block'; return; }
-  const btn = document.getElementById('setup-next-btn');
-  btn.classList.add('btn-loading'); btn.disabled=true;
-  try {
-    const cred = await A.auth.createUserWithEmailAndPassword(em, pw);
-    A.user = cred.user; updateNav(A.user); hideSetup();
-    toast('success','Setup complete!','Firebase connected and admin account created.');
-    go('admin');
-  } catch(e) {
-    let m = e.message;
-    if (e.code==='auth/email-already-in-use') m='Email already registered. Try logging in.';
-    errEl.textContent=m; errEl.style.display='block';
-  } finally { btn.classList.remove('btn-loading'); btn.disabled=false; }
-}
-document.getElementById('setup-demo-btn').onclick = () => {
-  A.demo=true; A.ships=[...DEMO];
-  A.user=null; updateNav(null);          // ← no auto-login; admin still requires credentials
-  hideSetup();
-  toast('info','Demo Mode Active',
-    'Public tracking uses sample data. Admin login: admin@demo.com / demo1234',8000);
-};
-document.getElementById('setup-next-btn').onclick = connectFB;
-
-/* ──────────────────────────────────────────────
-   5.  AUTH
+   3.  AUTH
    ────────────────────────────────────────────── */
 function setupAuthListener() {
   if (!A.auth) return;
-  A.auth.onAuthStateChanged(u => { A.user=u; updateNav(u); });
+  A.auth.onAuthStateChanged(u => { A.user = u; updateNav(u); });
 }
 function updateNav(u) {
   const isAuth = !!u;
-  document.getElementById('nl-admin').style.display = isAuth?'block':'none';
-  document.getElementById('nl-login').style.display = isAuth?'none':'block';
-  document.getElementById('nav-user').style.display = isAuth?'flex':'none';
-  document.getElementById('mob-admin').style.display  = isAuth?'block':'none';
-  document.getElementById('mob-login').style.display  = isAuth?'none':'block';
-  document.getElementById('mob-logout').style.display = isAuth?'block':'none';
+  document.getElementById('nl-admin').style.display  = isAuth ? 'block' : 'none';
+  document.getElementById('nl-login').style.display  = isAuth ? 'none'  : 'block';
+  document.getElementById('nav-user').style.display  = isAuth ? 'flex'  : 'none';
+  document.getElementById('mob-admin').style.display = isAuth ? 'block' : 'none';
+  document.getElementById('mob-login').style.display = isAuth ? 'none'  : 'block';
+  document.getElementById('mob-logout').style.display= isAuth ? 'block' : 'none';
   if (u) {
-    document.getElementById('nav-av').textContent = (u.email||'A').charAt(0).toUpperCase();
+    document.getElementById('nav-av').textContent  = (u.email || 'A').charAt(0).toUpperCase();
     document.getElementById('nav-uem').textContent = u.email;
   }
-  // Hide demo hint if Firebase is configured (not demo mode)
-  const hint = document.getElementById('demo-hint');
-  if (hint) hint.style.display = A.demo ? 'block' : 'none';
 }
 async function doLogin() {
   const em    = document.getElementById('l-email').value.trim();
   const pw    = document.getElementById('l-pass').value;
   const errEl = document.getElementById('l-err');
-  errEl.textContent='';
-  if (!em||!pw) { errEl.textContent='Email and password are required.'; return; }
-
-  /* ── DEMO MODE: check hardcoded credentials ── */
-  if (A.demo) {
-    if (em==='admin@demo.com' && pw==='demo1234') {
-      A.user={email:'admin@demo.com'}; updateNav(A.user);
-      go('admin');
-    } else {
-      errEl.textContent='Invalid credentials.  Demo → admin@demo.com / demo1234';
-    }
-    return;
-  }
-
-  /* ── FIREBASE MODE ── */
-  if (!A.auth) { toast('warning','Not configured','Set up Firebase first.'); showSetup(); return; }
-  const btn=document.getElementById('l-btn'); btn.classList.add('btn-loading'); btn.disabled=true;
+  errEl.textContent = '';
+  if (!em || !pw) { errEl.textContent = 'Email and password are required.'; return; }
+  if (!A.auth) { toast('error', 'Not Ready', 'Firebase failed to initialise. Check your connection.'); return; }
+  const btn = document.getElementById('l-btn');
+  btn.classList.add('btn-loading'); btn.disabled = true;
   try {
-    await A.auth.signInWithEmailAndPassword(em,pw);
+    await A.auth.signInWithEmailAndPassword(em, pw);
     go('admin');
   } catch(e) {
-    let m='Invalid email or password.';
-    if (e.code==='auth/too-many-requests') m='Too many attempts. Please try later.';
-    errEl.textContent=m;
-  } finally { btn.classList.remove('btn-loading'); btn.disabled=false; }
+    let m = 'Invalid email or password.';
+    if (e.code === 'auth/too-many-requests') m = 'Too many attempts. Please try later.';
+    errEl.textContent = m;
+  } finally { btn.classList.remove('btn-loading'); btn.disabled = false; }
 }
 async function doSignOut() {
   if (A.auth) try { await A.auth.signOut(); } catch(e) {}
-  A.user=null; updateNav(null);
-  // if in demo mode, keep demo data but lock admin again
+  A.user = null; updateNav(null);
   go('home');
-  toast('info','Signed out','You have been signed out of the admin panel.');
+  toast('info', 'Signed out', 'You have been signed out of the admin panel.');
 }
-/* Enter key on login */
-document.getElementById('l-pass').addEventListener('keypress',e=>{ if(e.key==='Enter') doLogin(); });
+document.getElementById('l-pass').addEventListener('keypress', e => { if (e.key === 'Enter') doLogin(); });
 
 /* ──────────────────────────────────────────────
-   6.  DATA / FIRESTORE
+   4.  DATA / FIRESTORE
    ────────────────────────────────────────────── */
 function genCode() {
-  const c='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  return 'XTR-'+Array.from({length:6},()=>c[Math.floor(Math.random()*c.length)]).join('');
+  const c = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  return 'FCL-' + Array.from({length:6}, () => c[Math.floor(Math.random() * c.length)]).join('');
 }
 async function dbCreate(data) {
-  if (A.demo) { const s={...data,id:'d'+Date.now()}; A.ships.unshift(s); return s; }
-  const ref = await A.db.collection('shipments').add({...data, createdAt:firebase.firestore.FieldValue.serverTimestamp()});
-  return {id:ref.id,...data};
+  const ref = await A.db.collection('shipments').add({
+    ...data, createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+  return { id: ref.id, ...data };
 }
-async function dbUpdate(id,data) {
-  if (A.demo) { const i=A.ships.findIndex(s=>s.id===id); if(i>-1) A.ships[i]={...A.ships[i],...data}; return; }
+async function dbUpdate(id, data) {
   await A.db.collection('shipments').doc(id).update(data);
 }
 async function dbDelete(id) {
-  if (A.demo) { A.ships=A.ships.filter(s=>s.id!==id); return; }
   await A.db.collection('shipments').doc(id).delete();
 }
 async function dbGetByCode(code) {
-  if (A.demo) return A.ships.find(s=>s.trackingCode.toUpperCase()===code.toUpperCase())||null;
-  const q = await A.db.collection('shipments').where('trackingCode','==',code.toUpperCase()).limit(1).get();
+  const q = await A.db.collection('shipments')
+    .where('trackingCode', '==', code.toUpperCase()).limit(1).get();
   if (q.empty) return null;
-  return {id:q.docs[0].id,...q.docs[0].data()};
+  return { id: q.docs[0].id, ...q.docs[0].data() };
 }
 async function dbGetAll() {
-  if (A.demo) return [...A.ships];
-  const q = await A.db.collection('shipments').orderBy('createdAt','desc').get();
-  return q.docs.map(d=>({id:d.id,...d.data()}));
+  const q = await A.db.collection('shipments').orderBy('createdAt', 'desc').get();
+  return q.docs.map(d => ({ id: d.id, ...d.data() }));
 }
 
 /* ──────────────────────────────────────────────
-   7.  ROUTER
+   5.  ROUTER
    ────────────────────────────────────────────── */
-function go(page, params={}) {
+function go(page, params = {}) {
   clearInterval(A.etaTimer); clearInterval(A.mapTimer);
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('[data-page]').forEach(l=>l.classList.toggle('active',l.dataset.page===page));
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('[data-page]').forEach(l => l.classList.toggle('active', l.dataset.page === page));
   A.page = page;
   const pages = {
     home:'pg-home', about:'pg-about', services:'pg-services',
@@ -1912,68 +1691,74 @@ function go(page, params={}) {
   };
   const pid = pages[page];
   if (pid) document.getElementById(pid).classList.add('active');
-  if (page==='admin') {
-    if (!A.user) { go('login'); return; }   // always require real auth
+  if (page === 'admin') {
+    if (!A.user) { go('login'); return; }
     loadDash();
   }
-  if (page==='track' && params.code) loadTrack(params.code);
-  window.scrollTo({top:0,behavior:'smooth'});
+  if (page === 'track' && params.code) loadTrack(params.code);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 /* ──────────────────────────────────────────────
-   8.  HOME
+   6.  HOME
    ────────────────────────────────────────────── */
 function trackFromHero() {
   const v = document.getElementById('hero-inp').value.trim();
-  if (!v) { toast('warning','Enter a code','Type your tracking code first.'); document.getElementById('hero-inp').focus(); return; }
-  go('track',{code:v});
+  if (!v) { toast('warning', 'Enter a code', 'Type your tracking code first.'); document.getElementById('hero-inp').focus(); return; }
+  go('track', { code: v });
 }
-document.getElementById('hero-inp').addEventListener('keypress',e=>{ if(e.key==='Enter') trackFromHero(); });
+document.getElementById('hero-inp').addEventListener('keypress', e => { if (e.key === 'Enter') trackFromHero(); });
 
 /* ──────────────────────────────────────────────
-   9.  TRACKING PAGE
+   7.  TRACKING PAGE
    ────────────────────────────────────────────── */
 async function loadTrack(code) {
-  const lo=document.getElementById('tr-loading'), er=document.getElementById('tr-error'), co=document.getElementById('tr-content');
-  lo.style.display='block'; er.style.display='none'; co.style.display='none';
+  const lo = document.getElementById('tr-loading');
+  const er = document.getElementById('tr-error');
+  const co = document.getElementById('tr-content');
+  lo.style.display = 'block'; er.style.display = 'none'; co.style.display = 'none';
   try {
     const s = await dbGetByCode(code);
-    if (!s) { lo.style.display='none'; er.style.display='block'; return; }
-    lo.style.display='none'; co.style.display='block';
+    if (!s) { lo.style.display = 'none'; er.style.display = 'block'; return; }
+    lo.style.display = 'none'; co.style.display = 'block';
     renderTrack(s); startETA(s); initMap(s); startMapSim(s);
-  } catch(e) { console.error(e); lo.style.display='none'; er.style.display='block'; }
+  } catch(e) {
+    console.error(e); lo.style.display = 'none'; er.style.display = 'block';
+  }
 }
 function renderTrack(s) {
-  const sc = STATUS[s.status]||STATUS['Pending'];
   document.getElementById('tc-code-txt').textContent = s.trackingCode;
-  document.getElementById('tc-pkg').textContent      = s.packageDescription||'Package';
-  document.getElementById('tc-route').textContent    = `${s.origin?.name||'Origin'} → ${s.destination?.name||'Destination'}`;
+  document.getElementById('tc-pkg').textContent      = s.packageDescription || 'Package';
+  document.getElementById('tc-route').textContent    = `${s.origin?.name || 'Origin'} → ${s.destination?.name || 'Destination'}`;
   document.getElementById('tc-status').innerHTML     = badge(s.status);
   const locPill = document.getElementById('tc-loc-pill');
   if (s.currentLocation?.label) {
-    locPill.style.display='inline-flex';
-    document.getElementById('tc-loc-txt').textContent=s.currentLocation.label;
-  } else locPill.style.display='none';
+    locPill.style.display = 'inline-flex';
+    document.getElementById('tc-loc-txt').textContent = s.currentLocation.label;
+  } else locPill.style.display = 'none';
   const hb = document.getElementById('hold-banner');
-  if (s.status==='On Hold'&&s.holdReason) { hb.style.display='flex'; document.getElementById('hold-reason').textContent=s.holdReason; }
-  else hb.style.display='none';
-  // Parties
-  const f=(id,v)=>{ const el=document.getElementById(id); if(el) el.textContent=v||'-'; };
-  f('tc-sn',s.sender?.name); f('tc-sa',s.sender?.address); f('tc-sp',s.sender?.phone); f('tc-se',s.sender?.email);
-  f('tc-rn',s.receiver?.name); f('tc-ra',s.receiver?.address); f('tc-rp',s.receiver?.phone); f('tc-re',s.receiver?.email);
-  renderTimeline(s.timeline||[]);
+  if (s.status === 'On Hold' && s.holdReason) {
+    hb.style.display = 'flex';
+    document.getElementById('hold-reason').textContent = s.holdReason;
+  } else hb.style.display = 'none';
+  const f = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v || '-'; };
+  f('tc-sn', s.sender?.name);  f('tc-sa', s.sender?.address);
+  f('tc-sp', s.sender?.phone); f('tc-se', s.sender?.email);
+  f('tc-rn', s.receiver?.name);  f('tc-ra', s.receiver?.address);
+  f('tc-rp', s.receiver?.phone); f('tc-re', s.receiver?.email);
+  renderTimeline(s.timeline || []);
 }
 function badge(status) {
-  const sc=STATUS[status]||STATUS['Pending'];
+  const sc = STATUS[status] || STATUS['Pending'];
   return `<span class="badge ${sc.cls}"><span class="bdot"></span>${status}</span>`;
 }
 function renderTimeline(tl) {
   const el = document.getElementById('tc-timeline');
-  if (!tl.length) { el.innerHTML='<p style="color:var(--text-3);">No timeline entries yet.</p>'; return; }
-  const sorted = [...tl].sort((a,b)=>getTs(b.timestamp)-getTs(a.timestamp));
-  el.innerHTML = sorted.map((e,i)=>{
-    const sc=STATUS[e.status]||STATUS['Pending'], ts=getTs(e.timestamp);
-    return `<div class="tl-item ${i===0?'current':''}">
+  if (!tl.length) { el.innerHTML = '<p style="color:var(--text-3);">No timeline entries yet.</p>'; return; }
+  const sorted = [...tl].sort((a, b) => getTs(b.timestamp) - getTs(a.timestamp));
+  el.innerHTML = sorted.map((e, i) => {
+    const sc = STATUS[e.status] || STATUS['Pending'], ts = getTs(e.timestamp);
+    return `<div class="tl-item ${i === 0 ? 'current' : ''}">
       <div class="tl-dot" style="background:${sc.col};"></div>
       <div class="tl-time">${fmtDT(ts)}</div>
       <div class="tl-status"><i class="fa-solid ${sc.icon}" style="color:${sc.col};margin-right:5px;"></i>${e.status}</div>
@@ -1983,144 +1768,145 @@ function renderTimeline(tl) {
 }
 
 /* ──────────────────────────────────────────────
-   10. ETA LOGIC
+   8.  ETA LOGIC
    ────────────────────────────────────────────── */
 function startETA(s) {
   clearInterval(A.etaTimer);
-  const tick=()=>{
-    const now=Date.now();
-    const etaTs=getTs(s.estimatedDelivery)||now;
-    const creTs=getTs(s.createdAt)||(etaTs-864e5*7);
-    const totalDur=Math.max(1,etaTs-creTs);
-    const isHold=s.status==='On Hold';
-    const isDel =s.status==='Delivered';
-    // Frozen pill
-    document.getElementById('eta-frozen').style.display  = isHold?'flex':'none';
-    document.getElementById('eta-row').style.opacity     = isHold?'.5':'1';
-    // Countdown value
+  const tick = () => {
+    const now   = Date.now();
+    const etaTs = getTs(s.estimatedDelivery) || now;
+    const creTs = getTs(s.createdAt) || (etaTs - 864e5 * 7);
+    const totalDur = Math.max(1, etaTs - creTs);
+    const isHold = s.status === 'On Hold';
+    const isDel  = s.status === 'Delivered';
+    document.getElementById('eta-frozen').style.display = isHold ? 'flex' : 'none';
+    document.getElementById('eta-row').style.opacity    = isHold ? '.5' : '1';
     let rem;
-    if (isHold)  rem = s.remainingTime!=null ? s.remainingTime : Math.max(0,etaTs-now);
-    else if(isDel) rem=0;
-    else rem = Math.max(0,etaTs-now);
+    if (isHold)       rem = s.remainingTime != null ? s.remainingTime : Math.max(0, etaTs - now);
+    else if (isDel)   rem = 0;
+    else              rem = Math.max(0, etaTs - now);
     renderCountdown(rem);
-    // Progress bar
-    const elapsed=now-creTs;
-    const prog=isDel?100:Math.min(100,Math.max(0,(elapsed/totalDur)*100));
-    document.getElementById('eta-prog').style.width=prog+'%';
-    // Date label
+    const elapsed = now - creTs;
+    const prog = isDel ? 100 : Math.min(100, Math.max(0, (elapsed / totalDur) * 100));
+    document.getElementById('eta-prog').style.width = prog + '%';
     document.getElementById('eta-dt').textContent =
-      isDel?'✓ Delivered':
-      isHold?'⏸ ETA on hold — remaining time preserved':
-      rem>0?'Expected: '+fmtDT(etaTs):'⚠ Delivery overdue — contact support';
+      isDel  ? '✓ Delivered' :
+      isHold ? '⏸ ETA on hold — remaining time preserved' :
+      rem > 0 ? 'Expected: ' + fmtDT(etaTs) : '⚠ Delivery overdue — contact support';
   };
-  tick(); A.etaTimer=setInterval(tick,1000);
+  tick(); A.etaTimer = setInterval(tick, 1000);
 }
 function renderCountdown(ms) {
-  const s=v=>String(Math.floor(v)).padStart(2,'0');
-  if(ms<=0){['ed','eh','em','es'].forEach(id=>document.getElementById(id).textContent='00');return;}
-  document.getElementById('ed').textContent=s(ms/864e5);
-  document.getElementById('eh').textContent=s((ms%864e5)/36e5);
-  document.getElementById('em').textContent=s((ms%36e5)/6e4);
-  document.getElementById('es').textContent=s((ms%6e4)/1e3);
+  const s = v => String(Math.floor(v)).padStart(2, '0');
+  if (ms <= 0) { ['ed','eh','em','es'].forEach(id => document.getElementById(id).textContent = '00'); return; }
+  document.getElementById('ed').textContent = s(ms / 864e5);
+  document.getElementById('eh').textContent = s((ms % 864e5) / 36e5);
+  document.getElementById('em').textContent = s((ms % 36e5) / 6e4);
+  document.getElementById('es').textContent = s((ms % 6e4) / 1e3);
 }
 
 /* ──────────────────────────────────────────────
-   11. MAP
+   9.  MAP
    ────────────────────────────────────────────── */
 function initMap(s) {
-  if (A.mapInst) { A.mapInst.remove(); A.mapInst=null; A.movMarker=null; }
-  const oLat=s.origin?.lat||40.7128, oLng=s.origin?.lng||-74.006;
-  const dLat=s.destination?.lat||34.0522, dLng=s.destination?.lng||-118.2437;
-  const cLat=s.currentLocation?.lat||oLat, cLng=s.currentLocation?.lng||oLng;
-  const mLat=(oLat+dLat)/2, mLng=(oLng+dLng)/2;
-  setTimeout(()=>{
+  if (A.mapInst) { A.mapInst.remove(); A.mapInst = null; A.movMarker = null; }
+  const oLat = s.origin?.lat || 40.7128, oLng = s.origin?.lng || -74.006;
+  const dLat = s.destination?.lat || 34.0522, dLng = s.destination?.lng || -118.2437;
+  const cLat = s.currentLocation?.lat || oLat, cLng = s.currentLocation?.lng || oLng;
+  const mLat = (oLat + dLat) / 2, mLng = (oLng + dLng) / 2;
+  setTimeout(() => {
     try {
-      A.mapInst=L.map('track-map',{zoomControl:true}).setView([mLat,mLng],4);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:18}).addTo(A.mapInst);
-      const mk=(color,emoji,size=28)=>L.divIcon({className:'',
-        html:`<div style="width:${size}px;height:${size}px;background:${color};border:3px solid white;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 12px rgba(0,0,0,.3);font-size:${size*0.45}px;">${emoji}</div>`,
-        iconSize:[size,size],iconAnchor:[size/2,size/2]});
-      L.marker([oLat,oLng],{icon:mk('#22c55e','▲')}).addTo(A.mapInst)
-        .bindPopup(`<b>Origin</b><br>${s.origin?.name||'Origin'}`);
-      L.marker([dLat,dLng],{icon:mk('#ef4444','★')}).addTo(A.mapInst)
-        .bindPopup(`<b>Destination</b><br>${s.destination?.name||'Destination'}`);
-      L.polyline([[oLat,oLng],[cLat,cLng],[dLat,dLng]],
-        {color:'#3b82f6',weight:2.5,opacity:.5,dashArray:'8,8'}).addTo(A.mapInst);
-      A.movMarker=L.marker([cLat,cLng],{icon:mk('#3b82f6','📦',34)}).addTo(A.mapInst)
-        .bindPopup(`<b>Current</b><br>${s.currentLocation?.label||'In Transit'}`);
+      A.mapInst = L.map('track-map', { zoomControl: true }).setView([mLat, mLng], 4);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap', maxZoom: 18
+      }).addTo(A.mapInst);
+      const mk = (color, emoji, size = 28) => L.divIcon({
+        className: '',
+        html: `<div style="width:${size}px;height:${size}px;background:${color};border:3px solid white;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 12px rgba(0,0,0,.3);font-size:${size * 0.45}px;">${emoji}</div>`,
+        iconSize: [size, size], iconAnchor: [size / 2, size / 2]
+      });
+      L.marker([oLat, oLng], { icon: mk('#22c55e', '▲') }).addTo(A.mapInst)
+        .bindPopup(`<b>Origin</b><br>${s.origin?.name || 'Origin'}`);
+      L.marker([dLat, dLng], { icon: mk('#ef4444', '★') }).addTo(A.mapInst)
+        .bindPopup(`<b>Destination</b><br>${s.destination?.name || 'Destination'}`);
+      L.polyline([[oLat, oLng], [cLat, cLng], [dLat, dLng]], {
+        color: '#3b82f6', weight: 2.5, opacity: .5, dashArray: '8,8'
+      }).addTo(A.mapInst);
+      A.movMarker = L.marker([cLat, cLng], { icon: mk('#3b82f6', '📦', 34) }).addTo(A.mapInst)
+        .bindPopup(`<b>Current</b><br>${s.currentLocation?.label || 'In Transit'}`);
       A.mapInst.invalidateSize();
-    } catch(e){ console.error('Map error:',e); }
-  },120);
+    } catch(e) { console.error('Map error:', e); }
+  }, 120);
 }
 function startMapSim(s) {
   clearInterval(A.mapTimer);
-  if (s.status==='On Hold'||s.status==='Delivered') return;
-  const oLat=s.origin?.lat||40.7128, oLng=s.origin?.lng||-74.006;
-  const dLat=s.destination?.lat||34.0522, dLng=s.destination?.lng||-118.2437;
-  const creTs=getTs(s.createdAt)||Date.now()-864e5;
-  const etaTs=getTs(s.estimatedDelivery)||Date.now()+864e5;
-  const total=Math.max(1,etaTs-creTs);
-  const upd=()=>{
-    if(!A.movMarker||!A.mapInst) return;
-    const prog=Math.min(1,Math.max(0,(Date.now()-creTs)/total));
-    A.movMarker.setLatLng([oLat+(dLat-oLat)*prog, oLng+(dLng-oLng)*prog]);
+  if (s.status === 'On Hold' || s.status === 'Delivered') return;
+  const oLat = s.origin?.lat || 40.7128, oLng = s.origin?.lng || -74.006;
+  const dLat = s.destination?.lat || 34.0522, dLng = s.destination?.lng || -118.2437;
+  const creTs = getTs(s.createdAt) || Date.now() - 864e5;
+  const etaTs = getTs(s.estimatedDelivery) || Date.now() + 864e5;
+  const total = Math.max(1, etaTs - creTs);
+  const upd = () => {
+    if (!A.movMarker || !A.mapInst) return;
+    const prog = Math.min(1, Math.max(0, (Date.now() - creTs) / total));
+    A.movMarker.setLatLng([oLat + (dLat - oLat) * prog, oLng + (dLng - oLng) * prog]);
   };
-  upd(); A.mapTimer=setInterval(upd,5000);
+  upd(); A.mapTimer = setInterval(upd, 5000);
 }
 
 /* ──────────────────────────────────────────────
-   12. ADMIN DASHBOARD
+   10. ADMIN DASHBOARD
    ────────────────────────────────────────────── */
 async function loadDash() {
   try {
     A.ships = await dbGetAll();
     renderStats(); renderRecent(); renderAll();
-  } catch(e) { console.error(e); toast('error','Error','Failed to load shipments.'); }
+  } catch(e) { console.error(e); toast('error', 'Error', 'Failed to load shipments.'); }
 }
 function renderStats() {
-  const cnt={};
-  A.ships.forEach(s=>{ cnt[s.status]=(cnt[s.status]||0)+1; });
-  document.getElementById('admin-stats').innerHTML=[
-    {l:'Total',v:A.ships.length,      ic:'fa-boxes-stacked', bg:'#dbeafe',ic2:'#1d4ed8'},
-    {l:'In Transit',v:cnt['In Transit']||0,ic:'fa-truck',     bg:'#dbeafe',ic2:'#1d4ed8'},
-    {l:'On Hold',v:cnt['On Hold']||0,  ic:'fa-circle-pause',  bg:'#fee2e2',ic2:'#dc2626'},
-    {l:'Delivered',v:cnt['Delivered']||0,ic:'fa-circle-check',bg:'#dcfce7',ic2:'#15803d'},
-  ].map(s=>`<div class="stat-c">
+  const cnt = {};
+  A.ships.forEach(s => { cnt[s.status] = (cnt[s.status] || 0) + 1; });
+  document.getElementById('admin-stats').innerHTML = [
+    { l:'Total',      v: A.ships.length,        ic:'fa-boxes-stacked', bg:'#dbeafe', ic2:'#1d4ed8' },
+    { l:'In Transit', v: cnt['In Transit'] || 0, ic:'fa-truck',         bg:'#dbeafe', ic2:'#1d4ed8' },
+    { l:'On Hold',    v: cnt['On Hold'] || 0,    ic:'fa-circle-pause',  bg:'#fee2e2', ic2:'#dc2626' },
+    { l:'Delivered',  v: cnt['Delivered'] || 0,  ic:'fa-circle-check',  bg:'#dcfce7', ic2:'#15803d' },
+  ].map(s => `<div class="stat-c">
     <div class="stat-c-icon" style="background:${s.bg};color:${s.ic2};"><i class="fa-solid ${s.ic}"></i></div>
     <div><h3>${s.v}</h3><p>${s.l}</p></div>
   </div>`).join('');
 }
 function renderRecent() {
   document.getElementById('recent-tbody').innerHTML =
-    A.ships.slice(0,5).map(s=>rowShort(s)).join('') ||
+    A.ships.slice(0, 5).map(s => rowShort(s)).join('') ||
     `<tr><td colspan="5"><div class="empty"><div class="empty-icon"><i class="fa-solid fa-inbox"></i></div><h3>No Shipments</h3><p>Create your first shipment.</p></div></td></tr>`;
 }
 function renderAll(list) {
-  list = list||A.ships;
-  document.getElementById('ship-count-l').textContent=`${list.length} shipment${list.length!==1?'s':''} found`;
+  list = list || A.ships;
+  document.getElementById('ship-count-l').textContent = `${list.length} shipment${list.length !== 1 ? 's' : ''} found`;
   document.getElementById('all-tbody').innerHTML =
-    list.map(s=>rowLong(s)).join('') ||
+    list.map(s => rowLong(s)).join('') ||
     `<tr><td colspan="7"><div class="empty"><div class="empty-icon"><i class="fa-solid fa-magnifying-glass"></i></div><h3>No Results</h3><p>Try adjusting your search.</p></div></td></tr>`;
 }
 function rowShort(s) {
-  const eta=getTs(s.estimatedDelivery);
+  const eta = getTs(s.estimatedDelivery);
   return `<tr>
     <td class="tc-cell">${s.trackingCode}</td>
-    <td>${s.receiver?.name||'-'}</td>
+    <td>${s.receiver?.name || '-'}</td>
     <td>${badge(s.status)}</td>
-    <td style="font-size:12px;color:var(--text-2);">${eta?fmtD(eta):'N/A'}</td>
+    <td style="font-size:12px;color:var(--text-2);">${eta ? fmtD(eta) : 'N/A'}</td>
     <td>${actionBtns(s)}</td>
   </tr>`;
 }
 function rowLong(s) {
-  const eta=getTs(s.estimatedDelivery);
+  const eta = getTs(s.estimatedDelivery);
   return `<tr>
     <td class="tc-cell">${s.trackingCode}</td>
-    <td style="font-size:12px;">${s.sender?.name||'-'}</td>
-    <td style="font-size:12px;">${s.receiver?.name||'-'}</td>
-    <td style="font-size:11px;color:var(--text-3);">${s.origin?.name||'-'} → ${s.destination?.name||'-'}</td>
-    <td>${badge(s.status)}${s.holdReason?`<br><span style="font-size:10px;color:var(--red);">${s.holdReason}</span>`:''}</td>
-    <td style="font-size:12px;color:var(--text-2);">${eta?fmtD(eta):'N/A'}</td>
+    <td style="font-size:12px;">${s.sender?.name || '-'}</td>
+    <td style="font-size:12px;">${s.receiver?.name || '-'}</td>
+    <td style="font-size:11px;color:var(--text-3);">${s.origin?.name || '-'} → ${s.destination?.name || '-'}</td>
+    <td>${badge(s.status)}${s.holdReason ? `<br><span style="font-size:10px;color:var(--red);">${s.holdReason}</span>` : ''}</td>
+    <td style="font-size:12px;color:var(--text-2);">${eta ? fmtD(eta) : 'N/A'}</td>
     <td>${actionBtns(s)}</td>
   </tr>`;
 }
@@ -2133,177 +1919,183 @@ function actionBtns(s) {
   </div>`;
 }
 function filterShips() {
-  const q=document.getElementById('s-search').value.toLowerCase();
-  const st=document.getElementById('s-filter').value;
-  renderAll(A.ships.filter(s=>{
-    const mq=!q||[s.trackingCode,s.sender?.name,s.receiver?.name,s.status,s.packageDescription].some(v=>v?.toLowerCase().includes(q));
-    const ms=!st||s.status===st;
-    return mq&&ms;
+  const q  = document.getElementById('s-search').value.toLowerCase();
+  const st = document.getElementById('s-filter').value;
+  renderAll(A.ships.filter(s => {
+    const mq = !q || [s.trackingCode, s.sender?.name, s.receiver?.name, s.status, s.packageDescription].some(v => v?.toLowerCase().includes(q));
+    const ms = !st || s.status === st;
+    return mq && ms;
   }));
 }
 function showTab(t) {
-  ['overview','shipments','create'].forEach(n=>{
-    document.getElementById('atab-'+n).style.display=n===t?'block':'none';
-    const el=document.getElementById('tab-'+n);
-    if(el) el.classList.toggle('active',n===t);
+  ['overview', 'shipments', 'create'].forEach(n => {
+    document.getElementById('atab-' + n).style.display = n === t ? 'block' : 'none';
+    const el = document.getElementById('tab-' + n);
+    if (el) el.classList.toggle('active', n === t);
   });
-  if(t==='create'&&!document.getElementById('f-eid').value) {
+  if (t === 'create' && !document.getElementById('f-eid').value) {
     resetForm();
-    document.getElementById('f-code').value=genCode();
-    document.getElementById('create-title').textContent='Create New Shipment';
-    document.getElementById('submit-lbl').textContent='Create Shipment';
+    document.getElementById('f-code').value = genCode();
+    document.getElementById('create-title').textContent = 'Create New Shipment';
+    document.getElementById('submit-lbl').textContent   = 'Create Shipment';
   }
 }
 
 /* ──────────────────────────────────────────────
-   13. CREATE / EDIT FORM
+   11. CREATE / EDIT FORM
    ────────────────────────────────────────────── */
 function onStatusChange() {
-  document.getElementById('hold-f-field').style.display=document.getElementById('f-status').value==='On Hold'?'block':'none';
+  document.getElementById('hold-f-field').style.display =
+    document.getElementById('f-status').value === 'On Hold' ? 'block' : 'none';
 }
 function resetForm() {
   ['f-desc','f-sn','f-sp','f-se','f-sa','f-rn','f-rp','f-re','f-ra',
-   'f-on','f-dn','f-oc','f-dc','f-cl','f-cc','f-hold','f-tmsg','f-eid'].forEach(id=>{
-    const el=document.getElementById(id); if(el) el.value='';
+   'f-on','f-dn','f-oc','f-dc','f-cl','f-cc','f-hold','f-tmsg','f-eid'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
   });
-  document.getElementById('f-status').value='Pending';
-  document.getElementById('hold-f-field').style.display='none';
-  document.getElementById('form-err').style.display='none';
-  const d7=new Date(Date.now()+7*864e5);
-  document.getElementById('f-eta').value=toLocal(d7);
+  document.getElementById('f-status').value = 'Pending';
+  document.getElementById('hold-f-field').style.display = 'none';
+  document.getElementById('form-err').style.display = 'none';
+  const d7 = new Date(Date.now() + 7 * 864e5);
+  document.getElementById('f-eta').value = toLocal(d7);
 }
 function parseCoords(str) {
-  if(!str) return null;
-  const p=str.split(',').map(s=>parseFloat(s.trim()));
-  if(p.length!==2||isNaN(p[0])||isNaN(p[1])) return null;
-  return {lat:p[0],lng:p[1]};
+  if (!str) return null;
+  const p = str.split(',').map(s => parseFloat(s.trim()));
+  if (p.length !== 2 || isNaN(p[0]) || isNaN(p[1])) return null;
+  return { lat: p[0], lng: p[1] };
 }
 function validateForm() {
-  const req={
-    'f-desc':'Package description','f-eta':'Estimated delivery',
-    'f-sn':'Sender name','f-sp':'Sender phone','f-se':'Sender email','f-sa':'Sender address',
-    'f-rn':'Receiver name','f-rp':'Receiver phone','f-re':'Receiver email','f-ra':'Receiver address',
-    'f-on':'Origin name','f-dn':'Destination name','f-oc':'Origin coordinates','f-dc':'Destination coordinates',
+  const req = {
+    'f-desc':'Package description', 'f-eta':'Estimated delivery',
+    'f-sn':'Sender name',    'f-sp':'Sender phone',  'f-se':'Sender email',    'f-sa':'Sender address',
+    'f-rn':'Receiver name',  'f-rp':'Receiver phone','f-re':'Receiver email',  'f-ra':'Receiver address',
+    'f-on':'Origin name',    'f-dn':'Destination name',
+    'f-oc':'Origin coordinates', 'f-dc':'Destination coordinates',
     'f-tmsg':'Timeline message'
   };
-  for(const [id,lbl] of Object.entries(req)) {
-    if(!document.getElementById(id).value.trim()) return lbl+' is required.';
+  for (const [id, lbl] of Object.entries(req)) {
+    if (!document.getElementById(id).value.trim()) return lbl + ' is required.';
   }
-  if(document.getElementById('f-status').value==='On Hold'&&!document.getElementById('f-hold').value.trim())
+  if (document.getElementById('f-status').value === 'On Hold' && !document.getElementById('f-hold').value.trim())
     return 'Hold reason is required when status is On Hold.';
-  if(!parseCoords(document.getElementById('f-oc').value)) return 'Origin coordinates must be: lat, lng (e.g. 40.71, -74.00)';
-  if(!parseCoords(document.getElementById('f-dc').value)) return 'Destination coordinates must be: lat, lng';
+  if (!parseCoords(document.getElementById('f-oc').value))
+    return 'Origin coordinates must be: lat, lng (e.g. 40.71, -74.00)';
+  if (!parseCoords(document.getElementById('f-dc').value))
+    return 'Destination coordinates must be: lat, lng';
   return null;
 }
 async function submitShipment() {
-  const err=validateForm();
-  const errEl=document.getElementById('form-err');
-  if(err){ errEl.textContent=err; errEl.style.display='block'; errEl.scrollIntoView({behavior:'smooth',block:'center'}); return; }
-  errEl.style.display='none';
-  const btn=document.getElementById('submit-btn'); btn.classList.add('btn-loading'); btn.disabled=true;
-  const status=document.getElementById('f-status').value;
-  const eta=new Date(document.getElementById('f-eta').value);
-  const isHold=status==='On Hold';
-  const oC=parseCoords(document.getElementById('f-oc').value);
-  const dC=parseCoords(document.getElementById('f-dc').value);
-  const cC=parseCoords(document.getElementById('f-cc').value)||oC;
-  const tlEntry={status,message:document.getElementById('f-tmsg').value.trim(),timestamp:new Date()};
-  const editId=document.getElementById('f-eid').value;
+  const err   = validateForm();
+  const errEl = document.getElementById('form-err');
+  if (err) { errEl.textContent = err; errEl.style.display = 'block'; errEl.scrollIntoView({ behavior:'smooth', block:'center' }); return; }
+  errEl.style.display = 'none';
+  const btn = document.getElementById('submit-btn'); btn.classList.add('btn-loading'); btn.disabled = true;
+  const status = document.getElementById('f-status').value;
+  const eta    = new Date(document.getElementById('f-eta').value);
+  const isHold = status === 'On Hold';
+  const oC = parseCoords(document.getElementById('f-oc').value);
+  const dC = parseCoords(document.getElementById('f-dc').value);
+  const cC = parseCoords(document.getElementById('f-cc').value) || oC;
+  const tlEntry = { status, message: document.getElementById('f-tmsg').value.trim(), timestamp: new Date() };
+  const editId  = document.getElementById('f-eid').value;
   try {
-    if(editId) {
-      const ex=A.ships.find(s=>s.id===editId);
-      await dbUpdate(editId,{
-        packageDescription:document.getElementById('f-desc').value.trim(), status,
-        holdReason:isHold?document.getElementById('f-hold').value.trim():'',
-        remainingTime:isHold?Math.max(0,eta.getTime()-Date.now()):null,
-        estimatedDelivery:eta,
-        sender:{name:g('f-sn'),phone:g('f-sp'),email:g('f-se'),address:g('f-sa')},
-        receiver:{name:g('f-rn'),phone:g('f-rp'),email:g('f-re'),address:g('f-ra')},
-        origin:{name:g('f-on'),...oC}, destination:{name:g('f-dn'),...dC},
-        currentLocation:{label:g('f-cl'),...cC},
-        timeline:[...(ex?.timeline||[]),tlEntry],
+    if (editId) {
+      const ex = A.ships.find(s => s.id === editId);
+      await dbUpdate(editId, {
+        packageDescription: g('f-desc'), status,
+        holdReason: isHold ? g('f-hold') : '',
+        remainingTime: isHold ? Math.max(0, eta.getTime() - Date.now()) : null,
+        estimatedDelivery: eta,
+        sender:      { name: g('f-sn'), phone: g('f-sp'), email: g('f-se'), address: g('f-sa') },
+        receiver:    { name: g('f-rn'), phone: g('f-rp'), email: g('f-re'), address: g('f-ra') },
+        origin:      { name: g('f-on'), ...oC },
+        destination: { name: g('f-dn'), ...dC },
+        currentLocation: { label: g('f-cl'), ...cC },
+        timeline: [...(ex?.timeline || []), tlEntry],
       });
-      toast('success','Updated',document.getElementById('f-code').value+' saved.');
+      toast('success', 'Updated', document.getElementById('f-code').value + ' saved.');
     } else {
       await dbCreate({
-        trackingCode:document.getElementById('f-code').value,
-        packageDescription:g('f-desc'), status,
-        holdReason:isHold?g('f-hold'):'',
-        remainingTime:isHold?Math.max(0,eta.getTime()-Date.now()):null,
-        estimatedDelivery:eta, createdAt:new Date(),
-        sender:{name:g('f-sn'),phone:g('f-sp'),email:g('f-se'),address:g('f-sa')},
-        receiver:{name:g('f-rn'),phone:g('f-rp'),email:g('f-re'),address:g('f-ra')},
-        origin:{name:g('f-on'),...oC}, destination:{name:g('f-dn'),...dC},
-        currentLocation:{label:g('f-cl')||g('f-on'),...cC},
-        timeline:[tlEntry],
+        trackingCode: document.getElementById('f-code').value,
+        packageDescription: g('f-desc'), status,
+        holdReason: isHold ? g('f-hold') : '',
+        remainingTime: isHold ? Math.max(0, eta.getTime() - Date.now()) : null,
+        estimatedDelivery: eta, createdAt: new Date(),
+        sender:      { name: g('f-sn'), phone: g('f-sp'), email: g('f-se'), address: g('f-sa') },
+        receiver:    { name: g('f-rn'), phone: g('f-rp'), email: g('f-re'), address: g('f-ra') },
+        origin:      { name: g('f-on'), ...oC },
+        destination: { name: g('f-dn'), ...dC },
+        currentLocation: { label: g('f-cl') || g('f-on'), ...cC },
+        timeline: [tlEntry],
       });
-      toast('success','Created',document.getElementById('f-code').value+' created.');
+      toast('success', 'Created', document.getElementById('f-code').value + ' created.');
     }
-    A.ships=await dbGetAll(); renderStats(); renderRecent(); renderAll(); resetForm(); showTab('shipments');
-  } catch(e){ toast('error','Error','Save failed: '+e.message); }
-  finally{ btn.classList.remove('btn-loading'); btn.disabled=false; }
+    A.ships = await dbGetAll(); renderStats(); renderRecent(); renderAll(); resetForm(); showTab('shipments');
+  } catch(e) { toast('error', 'Error', 'Save failed: ' + e.message); }
+  finally { btn.classList.remove('btn-loading'); btn.disabled = false; }
 }
-function g(id){ return document.getElementById(id)?.value.trim()||''; }
+function g(id) { return document.getElementById(id)?.value.trim() || ''; }
 
 /* ──────────────────────────────────────────────
-   14. EDIT MODAL (QUICK UPDATE)
+   12. EDIT MODAL (QUICK UPDATE)
    ────────────────────────────────────────────── */
 function openMoEdit(id) {
-  const s=A.ships.find(x=>x.id===id); if(!s) return;
-  A.editId=id;
-  document.getElementById('mo-code').textContent=s.trackingCode;
-  document.getElementById('mo-status').value=s.status;
-  document.getElementById('mo-hold').value=s.holdReason||'';
-  document.getElementById('mo-cl').value=s.currentLocation?.label||'';
-  document.getElementById('mo-cc').value=s.currentLocation?`${s.currentLocation.lat},${s.currentLocation.lng}`:'';
-  document.getElementById('mo-tmsg').value='';
+  const s = A.ships.find(x => x.id === id); if (!s) return;
+  A.editId = id;
+  document.getElementById('mo-code').textContent   = s.trackingCode;
+  document.getElementById('mo-status').value       = s.status;
+  document.getElementById('mo-hold').value         = s.holdReason || '';
+  document.getElementById('mo-cl').value           = s.currentLocation?.label || '';
+  document.getElementById('mo-cc').value           = s.currentLocation ? `${s.currentLocation.lat},${s.currentLocation.lng}` : '';
+  document.getElementById('mo-tmsg').value         = '';
   onMoStatusChange();
   document.getElementById('mo-edit').classList.add('show');
 }
 function onMoStatusChange() {
-  const nst=document.getElementById('mo-status').value;
-  const prev=(A.ships.find(s=>s.id===A.editId)||{}).status;
-  document.getElementById('mo-hold-f').style.display    = nst==='On Hold'?'block':'none';
-  document.getElementById('mo-resume-info').style.display= prev==='On Hold'&&nst!=='On Hold'?'block':'none';
+  const nst  = document.getElementById('mo-status').value;
+  const prev = (A.ships.find(s => s.id === A.editId) || {}).status;
+  document.getElementById('mo-hold-f').style.display     = nst === 'On Hold' ? 'block' : 'none';
+  document.getElementById('mo-resume-info').style.display= prev === 'On Hold' && nst !== 'On Hold' ? 'block' : 'none';
 }
 async function saveMoUpdate() {
-  const id=A.editId, s=A.ships.find(x=>x.id===id); if(!s) return;
-  const nst=document.getElementById('mo-status').value;
-  const hold=document.getElementById('mo-hold').value.trim();
-  const cl=document.getElementById('mo-cl').value.trim();
-  const cc=document.getElementById('mo-cc').value.trim();
-  const msg=document.getElementById('mo-tmsg').value.trim();
-  if(!msg){ toast('warning','Required','Please enter a timeline message.'); return; }
-  if(nst==='On Hold'&&!hold){ toast('warning','Required','Hold reason is required.'); return; }
-  const btn=document.getElementById('mo-save-btn'); btn.classList.add('btn-loading'); btn.disabled=true;
-  const now=Date.now();
-  const etaTs=getTs(s.estimatedDelivery)||now+864e5;
-  const wasHold=s.status==='On Hold', nowHold=nst==='On Hold';
-  let estimatedDelivery=s.estimatedDelivery, remainingTime=s.remainingTime;
-  if(nowHold&&!wasHold)   { remainingTime=Math.max(0,etaTs-now); }
-  if(!nowHold&&wasHold)   { const rt=s.remainingTime||Math.max(0,etaTs-now); estimatedDelivery=new Date(now+rt); remainingTime=null; }
-  const curCoords=parseCoords(cc)||{lat:s.currentLocation?.lat,lng:s.currentLocation?.lng};
+  const id = A.editId, s = A.ships.find(x => x.id === id); if (!s) return;
+  const nst  = document.getElementById('mo-status').value;
+  const hold = document.getElementById('mo-hold').value.trim();
+  const cl   = document.getElementById('mo-cl').value.trim();
+  const cc   = document.getElementById('mo-cc').value.trim();
+  const msg  = document.getElementById('mo-tmsg').value.trim();
+  if (!msg)              { toast('warning', 'Required', 'Please enter a timeline message.'); return; }
+  if (nst === 'On Hold' && !hold) { toast('warning', 'Required', 'Hold reason is required.'); return; }
+  const btn = document.getElementById('mo-save-btn'); btn.classList.add('btn-loading'); btn.disabled = true;
+  const now    = Date.now();
+  const etaTs  = getTs(s.estimatedDelivery) || now + 864e5;
+  const wasHold = s.status === 'On Hold', nowHold = nst === 'On Hold';
+  let estimatedDelivery = s.estimatedDelivery, remainingTime = s.remainingTime;
+  if (nowHold && !wasHold)  { remainingTime = Math.max(0, etaTs - now); }
+  if (!nowHold && wasHold)  { const rt = s.remainingTime || Math.max(0, etaTs - now); estimatedDelivery = new Date(now + rt); remainingTime = null; }
+  const curCoords = parseCoords(cc) || { lat: s.currentLocation?.lat, lng: s.currentLocation?.lng };
   try {
-    await dbUpdate(id,{
-      status:nst, holdReason:nowHold?hold:'',
+    await dbUpdate(id, {
+      status: nst, holdReason: nowHold ? hold : '',
       remainingTime, estimatedDelivery,
-      currentLocation:{label:cl,...curCoords},
-      timeline:[...(s.timeline||[]),{status:nst,message:msg,timestamp:new Date()}],
+      currentLocation: { label: cl, ...curCoords },
+      timeline: [...(s.timeline || []), { status: nst, message: msg, timestamp: new Date() }],
     });
-    A.ships=await dbGetAll(); renderStats(); renderRecent(); renderAll(); closeMo('mo-edit');
-    toast('success','Updated',`Status → ${nst}.${(!nowHold&&wasHold)?' ETA recalculated.':''}`);
-  } catch(e){ toast('error','Error','Update failed.'); }
-  finally{ btn.classList.remove('btn-loading'); btn.disabled=false; }
+    A.ships = await dbGetAll(); renderStats(); renderRecent(); renderAll(); closeMo('mo-edit');
+    toast('success', 'Updated', `Status → ${nst}.${(!nowHold && wasHold) ? ' ETA recalculated.' : ''}`);
+  } catch(e) { toast('error', 'Error', 'Update failed.'); }
+  finally { btn.classList.remove('btn-loading'); btn.disabled = false; }
 }
 
 /* ──────────────────────────────────────────────
-   15. VIEW MODAL
+   13. VIEW MODAL
    ────────────────────────────────────────────── */
 function viewShip(id) {
-  const s=A.ships.find(x=>x.id===id); if(!s) return;
-  const eta=getTs(s.estimatedDelivery), cre=getTs(s.createdAt);
-  const tlHTML=(s.timeline||[]).slice().reverse().map(e=>{
-    const sc=STATUS[e.status]||STATUS['Pending'], ts=getTs(e.timestamp);
+  const s = A.ships.find(x => x.id === id); if (!s) return;
+  const eta = getTs(s.estimatedDelivery), cre = getTs(s.createdAt);
+  const tlHTML = (s.timeline || []).slice().reverse().map(e => {
+    const sc = STATUS[e.status] || STATUS['Pending'], ts = getTs(e.timestamp);
     return `<div style="display:flex;gap:11px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border);">
       <div style="width:30px;height:30px;background:${sc.col};border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
         <i class="fa-solid ${sc.icon}" style="color:white;font-size:12px;"></i>
@@ -2313,22 +2105,22 @@ function viewShip(id) {
         <div style="font-size:11px;color:var(--text-3);margin-top:2px;">${fmtDT(ts)}</div>
       </div></div>`;
   }).join('');
-  document.getElementById('mo-view-body').innerHTML=`
+  document.getElementById('mo-view-body').innerHTML = `
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
       ${badge(s.status)}
       <code style="font-size:13px;color:var(--primary);font-weight:700;">${s.trackingCode}</code>
     </div>
-    <p style="font-weight:700;font-size:15px;margin-bottom:3px;">${s.packageDescription||'-'}</p>
-    <p style="font-size:12px;color:var(--text-2);margin-bottom:16px;">${s.origin?.name||'-'} → ${s.destination?.name||'-'}</p>
-    ${s.holdReason?`<div class="hold-banner" style="margin-bottom:16px;"><i class="fa-solid fa-circle-pause"></i><span>On Hold: ${s.holdReason}</span></div>`:''}
+    <p style="font-weight:700;font-size:15px;margin-bottom:3px;">${s.packageDescription || '-'}</p>
+    <p style="font-size:12px;color:var(--text-2);margin-bottom:16px;">${s.origin?.name || '-'} → ${s.destination?.name || '-'}</p>
+    ${s.holdReason ? `<div class="hold-banner" style="margin-bottom:16px;"><i class="fa-solid fa-circle-pause"></i><span>On Hold: ${s.holdReason}</span></div>` : ''}
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px;font-size:13px;">
-      <div><div class="ig-l">Sender</div><div class="ig-v">${s.sender?.name||'-'}</div><div class="ig-sub">${s.sender?.email||''}</div></div>
-      <div><div class="ig-l">Receiver</div><div class="ig-v">${s.receiver?.name||'-'}</div><div class="ig-sub">${s.receiver?.email||''}</div></div>
+      <div><div class="ig-l">Sender</div><div class="ig-v">${s.sender?.name || '-'}</div><div class="ig-sub">${s.sender?.email || ''}</div></div>
+      <div><div class="ig-l">Receiver</div><div class="ig-v">${s.receiver?.name || '-'}</div><div class="ig-sub">${s.receiver?.email || ''}</div></div>
       <div><div class="ig-l">Created</div><div class="ig-v" style="font-size:13px;">${fmtDT(cre)}</div></div>
-      <div><div class="ig-l">ETA</div><div class="ig-v" style="font-size:13px;">${eta?fmtDT(eta):'N/A'}</div></div>
+      <div><div class="ig-l">ETA</div><div class="ig-v" style="font-size:13px;">${eta ? fmtDT(eta) : 'N/A'}</div></div>
     </div>
     <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text-3);margin-bottom:10px;">Timeline</div>
-    ${tlHTML||'<p style="color:var(--text-3);font-size:13px;">No entries.</p>'}
+    ${tlHTML || '<p style="color:var(--text-3);font-size:13px;">No entries.</p>'}
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px;padding-top:14px;border-top:1px solid var(--border);">
       <button class="btn btn-accent btn-sm" onclick='openMoEdit("${s.id}");closeMo("mo-view");'><i class="fa-solid fa-pen"></i> Update</button>
       <button class="btn btn-primary btn-sm" onclick='go("track",{code:"${s.trackingCode}"});closeMo("mo-view");'><i class="fa-solid fa-location-dot"></i> Track</button>
@@ -2337,83 +2129,84 @@ function viewShip(id) {
 }
 
 /* ──────────────────────────────────────────────
-   16. DELETE
+   14. DELETE
    ────────────────────────────────────────────── */
-function openMoDel(id,code){ A.delId=id; A.delCode=code; document.getElementById('del-code').textContent=code; document.getElementById('mo-del').classList.add('show'); }
+function openMoDel(id, code) {
+  A.delId = id; A.delCode = code;
+  document.getElementById('del-code').textContent = code;
+  document.getElementById('mo-del').classList.add('show');
+}
 async function confirmDel() {
-  const btn=document.getElementById('del-confirm-btn'); btn.classList.add('btn-loading'); btn.disabled=true;
+  const btn = document.getElementById('del-confirm-btn'); btn.classList.add('btn-loading'); btn.disabled = true;
   try {
     await dbDelete(A.delId);
-    A.ships=await dbGetAll(); renderStats(); renderRecent(); renderAll(); closeMo('mo-del');
-    toast('success','Deleted',A.delCode+' deleted.');
-  } catch(e){ toast('error','Error','Delete failed.'); }
-  finally{ btn.classList.remove('btn-loading'); btn.disabled=false; }
+    A.ships = await dbGetAll(); renderStats(); renderRecent(); renderAll(); closeMo('mo-del');
+    toast('success', 'Deleted', A.delCode + ' deleted.');
+  } catch(e) { toast('error', 'Error', 'Delete failed.'); }
+  finally { btn.classList.remove('btn-loading'); btn.disabled = false; }
 }
 
 /* ──────────────────────────────────────────────
-   17. CONTACT
+   15. CONTACT
    ────────────────────────────────────────────── */
 function submitContact() {
-  const fn=document.getElementById('c-fn').value.trim();
-  const ln=document.getElementById('c-ln').value.trim();
-  const em=document.getElementById('c-em').value.trim();
-  const mg=document.getElementById('c-msg').value.trim();
-  if(!fn||!ln||!em||!mg){ toast('warning','Required','Please fill in all required fields.'); return; }
-  if(!/^[^@]+@[^@]+\.[^@]+$/.test(em)){ toast('warning','Invalid email','Please enter a valid email address.'); return; }
-  ['c-fn','c-ln','c-em','c-ph','c-msg'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
-  toast('success','Message Sent!','Thank you! We\'ll respond within 24 hours.',5000);
+  const fn = document.getElementById('c-fn').value.trim();
+  const ln = document.getElementById('c-ln').value.trim();
+  const em = document.getElementById('c-em').value.trim();
+  const mg = document.getElementById('c-msg').value.trim();
+  if (!fn || !ln || !em || !mg) { toast('warning', 'Required', 'Please fill in all required fields.'); return; }
+  if (!/^[^@]+@[^@]+\.[^@]+$/.test(em)) { toast('warning', 'Invalid email', 'Please enter a valid email address.'); return; }
+  ['c-fn','c-ln','c-em','c-ph','c-msg'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  toast('success', 'Message Sent!', "Thank you! We'll respond within 24 hours.", 5000);
 }
 
 /* ──────────────────────────────────────────────
-   18. NAV HELPERS
+   16. NAV HELPERS
    ────────────────────────────────────────────── */
-function toggleMob(){ document.getElementById('mob-menu').classList.toggle('open'); }
-function closeMob(){ document.getElementById('mob-menu').classList.remove('open'); }
-function closeMo(id){ document.getElementById(id).classList.remove('show'); }
-document.querySelectorAll('.mo').forEach(m=>m.addEventListener('click',e=>{ if(e.target===m) m.classList.remove('show'); }));
+function toggleMob() { document.getElementById('mob-menu').classList.toggle('open'); }
+function closeMob()  { document.getElementById('mob-menu').classList.remove('open'); }
+function closeMo(id) { document.getElementById(id).classList.remove('show'); }
+document.querySelectorAll('.mo').forEach(m => m.addEventListener('click', e => { if (e.target === m) m.classList.remove('show'); }));
 
 /* ──────────────────────────────────────────────
-   19. TOAST
+   17. TOAST
    ────────────────────────────────────────────── */
-function toast(type,title,msg,dur=4000){
-  const icons={success:'fa-check-circle',error:'fa-times-circle',warning:'fa-exclamation-triangle',info:'fa-info-circle'};
-  const el=document.createElement('div');
-  el.className=`toast ${type}`;
-  el.innerHTML=`<i class="fa-solid ${icons[type]||icons.info} toast-icon"></i>
-    <div><div class="toast-t">${title}</div>${msg?`<div class="toast-m">${msg}</div>`:''}</div>
+function toast(type, title, msg, dur = 4000) {
+  const icons = { success:'fa-check-circle', error:'fa-times-circle', warning:'fa-exclamation-triangle', info:'fa-info-circle' };
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.innerHTML = `<i class="fa-solid ${icons[type] || icons.info} toast-icon"></i>
+    <div><div class="toast-t">${title}</div>${msg ? `<div class="toast-m">${msg}</div>` : ''}</div>
     <button class="toast-x" onclick="this.parentElement.remove()"><i class="fa-solid fa-xmark"></i></button>`;
   document.getElementById('toast-wrap').appendChild(el);
-  setTimeout(()=>{ el.style.animation='slideRight .3s ease reverse'; setTimeout(()=>el.remove(),300); },dur);
+  setTimeout(() => { el.style.animation = 'slideRight .3s ease reverse'; setTimeout(() => el.remove(), 300); }, dur);
 }
 
 /* ──────────────────────────────────────────────
-   20. DATE UTILS
+   18. DATE UTILS
    ────────────────────────────────────────────── */
-function getTs(v){
-  if(!v) return null;
-  if(v instanceof Date) return v.getTime();
-  if(typeof v==='number') return v;
-  if(v?.toMillis) return v.toMillis();
-  if(v?.seconds) return v.seconds*1000;
-  try{ return new Date(v).getTime(); }catch{ return null; }
+function getTs(v) {
+  if (!v) return null;
+  if (v instanceof Date) return v.getTime();
+  if (typeof v === 'number') return v;
+  if (v?.toMillis) return v.toMillis();
+  if (v?.seconds) return v.seconds * 1000;
+  try { return new Date(v).getTime(); } catch { return null; }
 }
-function fmtD(ts){ return ts?new Date(ts).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'N/A'; }
-function fmtDT(ts){ return ts?new Date(ts).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'}):'N/A'; }
-function toLocal(d){ const o=d.getTimezoneOffset(); return new Date(d.getTime()-o*60000).toISOString().slice(0,16); }
+function fmtD(ts)  { return ts ? new Date(ts).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }) : 'N/A'; }
+function fmtDT(ts) { return ts ? new Date(ts).toLocaleString('en-US', { month:'short', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit' }) : 'N/A'; }
+function toLocal(d){ const o = d.getTimezoneOffset(); return new Date(d.getTime() - o * 60000).toISOString().slice(0, 16); }
 
 /* ──────────────────────────────────────────────
-   21. BOOT
+   19. BOOT
    ────────────────────────────────────────────── */
-(function boot(){
-  const fbOk = loadCfg();
-  if(fbOk){
-    A.demo=false; setupAuthListener();
-    setTimeout(()=>toast('info','Firebase Ready','Connected to your Firestore database.',4000),800);
+(function boot() {
+  const ok = initFB();
+  if (ok) {
+    setupAuthListener();
+    setTimeout(() => toast('info', 'Connected', 'Welcome to xtracking.', 3500), 600);
   } else {
-    A.demo=true; A.ships=[...DEMO];
-    A.user=null; updateNav(null);          // ← no auto-login; admin requires credentials
-    setTimeout(()=>toast('info','Demo Mode',
-      'Public tracking uses sample data. Admin: admin@demo.com / demo1234',8000),1000);
+    toast('error', 'Firebase Error', 'Failed to connect to Firebase. Check console for details.', 8000);
   }
   go('home');
 })();
