@@ -866,6 +866,29 @@ table {
     font-size: 30px;
   }
 }
+@media (max-width: 768px) {
+  .nav-inner {
+    padding: 0 14px;
+    gap: 8px;
+  }
+  .nav-brand {
+    flex-shrink: 1;
+    min-width: 0;
+    overflow: hidden;
+  }
+  .nav-brand-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .burger {
+    flex-shrink: 0;
+    margin-left: auto;
+  }
+  .nav-user {
+    flex-shrink: 0;
+  }
+}
 /* ====== END MOBILE RESPONSIVE FIX ====== */
 </style>
 </head>
