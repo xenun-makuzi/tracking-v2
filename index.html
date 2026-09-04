@@ -892,6 +892,645 @@ table {
 }
 /* ====== END MOBILE RESPONSIVE FIX ====== */
 </style>
+
+<style id="major-visual-redesign">
+/* ============================================================
+   FIRSTCHOICE LOGISTICS — MAJOR VISUAL REDESIGN
+   Image files expected beside this HTML file:
+   logo.png
+   hero-logistics.jpg
+   warehouse.jpg
+   logistics-truck.jpg
+   loading-plane.jpg
+   about-warehouse.jpg
+   service-express.jpg
+   service-air-freight.jpg
+   service-ocean-freight.jpg
+   service-warehousing.jpg
+   service-reverse-logistics.jpg
+   service-analytics.jpg
+   ============================================================ */
+
+@property --counter-value {
+  syntax: "<integer>";
+  inherits: false;
+  initial-value: 0;
+}
+
+:root {
+  --visual-dark: #07111f;
+  --visual-blue: #0d3b91;
+  --visual-orange: #f97316;
+  --glass: rgba(255,255,255,.10);
+}
+
+/* ---------- global motion ---------- */
+body {
+  overflow-x: hidden;
+}
+
+.page.active {
+  animation: majorPageIn .55s cubic-bezier(.22,1,.36,1);
+}
+
+@keyframes majorPageIn {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.reveal {
+  animation: revealUp .85s cubic-bezier(.22,1,.36,1) both;
+}
+.reveal.delay-1 { animation-delay: .08s; }
+.reveal.delay-2 { animation-delay: .16s; }
+.reveal.delay-3 { animation-delay: .24s; }
+.reveal.delay-4 { animation-delay: .32s; }
+
+@keyframes revealUp {
+  from { opacity: 0; transform: translateY(34px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- header / logo ---------- */
+.nav {
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.nav-brand-icon.logo-holder {
+  background: rgba(255,255,255,.98);
+  padding: 5px;
+  overflow: hidden;
+}
+
+.nav-brand-icon.logo-holder img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.nav-brand {
+  transition: transform .3s ease;
+}
+.nav-brand:hover { transform: translateY(-1px); }
+
+/* ---------- image system ---------- */
+.visual-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.image-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 22px;
+  min-height: 310px;
+  box-shadow: 0 24px 60px rgba(7,17,31,.16);
+  background: #dbe4ef;
+}
+
+.image-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 45%, rgba(7,17,31,.68));
+  pointer-events: none;
+}
+
+.image-card img {
+  transition: transform .9s cubic-bezier(.22,1,.36,1), filter .5s ease;
+}
+
+.image-card:hover img {
+  transform: scale(1.06);
+  filter: saturate(1.08);
+}
+
+.image-caption {
+  position: absolute;
+  z-index: 2;
+  left: 22px;
+  right: 22px;
+  bottom: 20px;
+  color: #fff;
+}
+.image-caption strong {
+  display: block;
+  font-family: 'Syne', sans-serif;
+  font-size: 18px;
+  margin-bottom: 3px;
+}
+.image-caption span {
+  font-size: 12px;
+  color: rgba(255,255,255,.75);
+}
+
+/* ---------- hero ---------- */
+.hero {
+  min-height: 690px;
+  display: flex;
+  align-items: center;
+  text-align: left;
+  padding: 105px 28px 90px;
+  background:
+    linear-gradient(90deg, rgba(4,13,27,.92) 0%, rgba(4,13,27,.78) 40%, rgba(4,13,27,.32) 78%, rgba(4,13,27,.15) 100%),
+    url("hero-logistics.jpg") center/cover no-repeat;
+  position: relative;
+  isolation: isolate;
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(circle at 72% 25%, rgba(249,115,22,.24), transparent 28%),
+    linear-gradient(120deg, transparent 40%, rgba(16,64,160,.22));
+  animation: heroGlow 8s ease-in-out infinite alternate;
+}
+
+@keyframes heroGlow {
+  from { opacity: .65; transform: scale(1); }
+  to { opacity: 1; transform: scale(1.04); }
+}
+
+.hero-grid-bg {
+  opacity: .055;
+}
+
+.hero-content {
+  max-width: 900px;
+  margin: 0;
+}
+
+.hero h1 {
+  max-width: 800px;
+  font-size: clamp(44px, 6.2vw, 78px);
+  text-shadow: 0 10px 40px rgba(0,0,0,.28);
+}
+
+.hero p {
+  max-width: 650px;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.hero-track {
+  margin-left: 0;
+  max-width: 610px;
+  transition: transform .35s ease, box-shadow .35s ease;
+}
+.hero-track:focus-within {
+  transform: translateY(-3px);
+  box-shadow: 0 24px 65px rgba(0,0,0,.32), 0 0 0 2px rgba(249,115,22,.25);
+}
+
+.hero-badge {
+  animation: badgeFloat 3s ease-in-out infinite;
+}
+@keyframes badgeFloat {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.hero-floaters {
+  justify-content: flex-start;
+}
+
+/* ---------- animated stats ---------- */
+.stats-strip {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 15% 0%, rgba(249,115,22,.16), transparent 28%),
+    radial-gradient(circle at 90% 100%, rgba(24,84,200,.22), transparent 32%),
+    var(--navy);
+}
+
+.stats-strip::before {
+  content: "";
+  position: absolute;
+  left: -10%;
+  top: 50%;
+  width: 120%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.15), transparent);
+  animation: statLine 5s linear infinite;
+}
+@keyframes statLine {
+  from { transform: translateX(-12%); }
+  to { transform: translateX(12%); }
+}
+
+.stat-n.counter {
+  display: inline-block;
+  min-width: 2ch;
+  font-variant-numeric: tabular-nums;
+  counter-reset: count var(--counter-value);
+  animation: counterUp 2.2s cubic-bezier(.22,1,.36,1) .25s forwards;
+  --counter-value: 0;
+}
+
+.stat-n.counter::before {
+  content: counter(count);
+}
+
+.stat-n.counter .counter-suffix {
+  position: relative;
+  margin-left: 2px;
+}
+
+.stat-n.counter.initial-hidden {
+  font-size: 0;
+}
+.stat-n.counter.initial-hidden::before {
+  font-size: clamp(36px, 4vw, 52px);
+}
+
+.counter-packages { --target: 12; }
+.counter-rate     { --target: 98; }
+.counter-countries{ --target: 150; }
+.counter-years    { --target: 11; }
+
+@keyframes counterUp {
+  from { --counter-value: 0; }
+  to   { --counter-value: var(--target); }
+}
+
+.stat-box {
+  position: relative;
+  z-index: 1;
+  padding: 12px 8px;
+  transition: transform .3s ease;
+}
+.stat-box:hover { transform: translateY(-6px); }
+
+.stat-icon {
+  width: 42px;
+  height: 42px;
+  margin: 0 auto 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: white;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.10);
+}
+
+/* ---------- trust / reach strip ---------- */
+.global-strip {
+  background: #fff;
+  border-bottom: 1px solid var(--border);
+  padding: 17px 28px;
+}
+.global-strip-inner {
+  max-width: 1160px;
+  margin: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px 28px;
+  color: var(--text-2);
+  font-size: 13px;
+}
+.global-strip strong {
+  color: var(--text);
+}
+.global-dot {
+  width: 7px;
+  height: 7px;
+  background: var(--accent);
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 7px;
+  animation: pulse-dot 1.7s infinite;
+}
+
+/* ---------- operations showcase ---------- */
+.showcase-sec {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 30px 28px 92px;
+}
+
+.showcase-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 25px;
+  align-items: end;
+  margin-bottom: 30px;
+}
+.showcase-head .sec-hd {
+  text-align: left;
+  margin: 0;
+}
+.showcase-head .sec-hd p {
+  margin: 0;
+}
+
+.showcase-grid {
+  display: grid;
+  grid-template-columns: 1.25fr .75fr .75fr;
+  grid-auto-rows: 260px;
+  gap: 18px;
+}
+.showcase-grid .image-card:first-child {
+  grid-row: span 2;
+}
+
+.showcase-grid .image-card {
+  min-height: 0;
+}
+
+.operations-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 9px 14px;
+  color: var(--text-2);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+/* ---------- global network section ---------- */
+.network-sec {
+  background:
+    linear-gradient(135deg, rgba(7,17,31,.97), rgba(13,59,145,.92)),
+    url("warehouse.jpg") center/cover;
+  padding: 92px 28px;
+  position: relative;
+  overflow: hidden;
+}
+.network-sec::before {
+  content: "";
+  position: absolute;
+  width: 420px;
+  height: 420px;
+  right: -160px;
+  top: -180px;
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 50%;
+  box-shadow: 0 0 0 55px rgba(255,255,255,.025), 0 0 0 110px rgba(255,255,255,.02);
+}
+.network-inner {
+  max-width: 1180px;
+  margin: 0 auto;
+  position: relative;
+}
+.network-content {
+  max-width: 700px;
+  color: white;
+}
+.network-content h2 {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(30px,4vw,50px);
+  line-height: 1.1;
+  margin: 12px 0 15px;
+}
+.network-content p {
+  color: rgba(255,255,255,.68);
+  max-width: 610px;
+}
+.region-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 25px;
+}
+.region-chips span {
+  padding: 8px 13px;
+  border: 1px solid rgba(255,255,255,.13);
+  background: rgba(255,255,255,.07);
+  border-radius: 100px;
+  font-size: 12px;
+  color: rgba(255,255,255,.8);
+  backdrop-filter: blur(8px);
+  transition: .25s ease;
+}
+.region-chips span:hover {
+  background: rgba(249,115,22,.18);
+  border-color: rgba(249,115,22,.45);
+  transform: translateY(-2px);
+}
+
+/* ---------- feature cards ---------- */
+.feat-card, .srv-card, .val-card, .team-card {
+  transition: transform .4s cubic-bezier(.22,1,.36,1), box-shadow .4s ease, border-color .3s ease;
+}
+.feat-card:hover, .srv-card:hover, .val-card:hover, .team-card:hover {
+  transform: translateY(-9px);
+  box-shadow: 0 20px 48px rgba(10,22,40,.13);
+}
+
+/* ---------- about ---------- */
+.about-hero {
+  text-align: left;
+  min-height: 390px;
+  display: flex;
+  align-items: center;
+  position: relative;
+  background:
+    linear-gradient(90deg, rgba(7,17,31,.94), rgba(7,17,31,.65), rgba(7,17,31,.35)),
+    url("about-warehouse.jpg") center/cover no-repeat;
+}
+.about-hero > * {
+  max-width: 1240px;
+}
+.about-hero .sec-label,
+.about-hero h1,
+.about-hero p {
+  position: relative;
+  margin-left: max(0px, calc((100vw - 1184px)/2));
+}
+.about-hero h1 {
+  margin-top: 8px;
+}
+.about-hero p {
+  margin-left: max(0px, calc((100vw - 1184px)/2));
+  margin-right: 20px;
+  max-width: 590px;
+}
+
+.story-photo {
+  padding: 0;
+  min-height: 500px;
+}
+.story-photo::after {
+  background: linear-gradient(180deg, transparent 35%, rgba(7,17,31,.8));
+}
+.story-photo .mission-overlay {
+  position: absolute;
+  z-index: 2;
+  left: 28px;
+  right: 28px;
+  bottom: 28px;
+  color: white;
+}
+.mission-overlay h3 {
+  font-family: 'Syne', sans-serif;
+  font-size: 26px;
+  margin-bottom: 7px;
+}
+.mission-overlay p {
+  font-size: 13px;
+  color: rgba(255,255,255,.76);
+  max-width: 520px;
+}
+
+/* ---------- services ---------- */
+.services-hero {
+  min-height: 390px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background:
+    linear-gradient(135deg, rgba(7,17,31,.94), rgba(13,59,145,.68)),
+    url("service-air-freight.jpg") center/cover no-repeat;
+}
+
+.srv-card {
+  padding: 0;
+}
+.srv-image {
+  height: 210px;
+  position: relative;
+  overflow: hidden;
+}
+.srv-image::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 42%, rgba(7,17,31,.35));
+}
+.srv-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform .7s cubic-bezier(.22,1,.36,1);
+}
+.srv-card:hover .srv-image img { transform: scale(1.07); }
+
+.srv-body {
+  padding: 25px 28px 28px;
+}
+.srv-body .srv-icon {
+  margin-top: -51px;
+  position: relative;
+  z-index: 2;
+  border: 4px solid white;
+}
+.srv-body h3 { margin-top: 0; }
+
+/* ---------- contact ---------- */
+.contact-hero {
+  min-height: 360px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background:
+    linear-gradient(135deg, rgba(7,17,31,.95), rgba(13,59,145,.75)),
+    url("logistics-truck.jpg") center/cover no-repeat;
+}
+
+/* ---------- footer logo ---------- */
+.footer-logo {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: white;
+  padding: 5px;
+  object-fit: contain;
+  display: block;
+  margin-bottom: 14px;
+}
+
+/* ---------- accessibility ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .showcase-grid {
+    grid-template-columns: 1fr 1fr;
+    grid-auto-rows: 230px;
+  }
+  .showcase-grid .image-card:first-child {
+    grid-column: span 2;
+    grid-row: span 1;
+  }
+  .showcase-head {
+    align-items: start;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero {
+    min-height: 650px;
+    padding-top: 82px;
+    padding-bottom: 70px;
+    background-position: 62% center;
+  }
+  .hero-content { text-align: left; }
+  .hero-floaters { display: flex; justify-content: flex-start; }
+  .global-strip-inner { justify-content: flex-start; gap: 8px 18px; }
+  .showcase-sec { padding-left: 16px; padding-right: 16px; }
+  .showcase-grid {
+    grid-template-columns: 1fr;
+    grid-auto-rows: 260px;
+  }
+  .showcase-grid .image-card:first-child {
+    grid-column: auto;
+  }
+  .network-sec { padding-left: 20px; padding-right: 20px; }
+  .about-hero {
+    min-height: 390px;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  .about-hero .sec-label,
+  .about-hero h1,
+  .about-hero p {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero {
+    min-height: 620px;
+    background-position: 66% center;
+  }
+  .hero-track {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .hero-track .btn { width: 100%; }
+  .hero-floaters {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .image-card { min-height: 280px; }
+  .story-photo { min-height: 390px; }
+}
+</style>
+
 </head>
 <body>
 
@@ -901,7 +1540,7 @@ table {
 <nav class="nav" style="position:relative;">
   <div class="nav-inner">
     <div class="nav-brand" onclick="go('home')">
-      <div class="nav-brand-icon"><i class="fa-solid fa-truck-fast"></i></div>
+      <div class="nav-brand-icon logo-holder"><img src="logo.png" alt="FirstChoice Logistics logo"></div>
       <span class="nav-brand-name">FirstChoice<em>Logistics</em></span>
     </div>
     <ul class="nav-links" id="nav-links">
@@ -942,79 +1581,157 @@ table {
 
 <!-- ═══ HOME PAGE ═══ -->
 <div id="pg-home" class="page">
-  <!-- Hero -->
+  <!-- HERO -->
   <section class="hero">
     <div class="hero-grid-bg"></div>
     <div class="hero-content">
-      <div class="hero-badge"><span></span> Live Tracking Platform &nbsp;·&nbsp; Firebase Powered</div>
-      <h1>Track Every Package,<br><em>Everywhere.</em></h1>
-      <p>Enterprise-grade shipment management with real-time GPS simulation, smart ETA engine, and full lifecycle control.</p>
-      <div class="hero-track">
+      <div class="hero-badge reveal"><span></span> Global Logistics &nbsp;·&nbsp; Real-Time Shipment Tracking</div>
+      <h1 class="reveal delay-1">Move What Matters.<br><em>Anywhere in the World.</em></h1>
+      <p class="reveal delay-2">Reliable freight, delivery, warehousing and shipment visibility for businesses moving goods across the United States, Europe and international markets.</p>
+
+      <div class="hero-track reveal delay-3">
         <i class="fa-solid fa-barcode" style="color:var(--text-3);padding:0 4px 0 14px;font-size:17px;"></i>
         <input id="hero-inp" type="text" placeholder="Enter tracking code  (e.g. FCL-ABC123)" maxlength="20" autocomplete="off"/>
-        <button class="btn btn-accent" onclick="trackFromHero()">Track Now</button>
+        <button class="btn btn-accent" onclick="trackFromHero()">Track Now <i class="fa-solid fa-arrow-right"></i></button>
       </div>
-      <p class="hero-hint">
-        <i class="fa-solid fa-lock"></i> Secure &nbsp;·&nbsp;
-        <i class="fa-solid fa-satellite-dish"></i> Real-Time &nbsp;·&nbsp;
-        <i class="fa-solid fa-globe"></i> Global Coverage
+
+      <p class="hero-hint reveal delay-3">
+        <i class="fa-solid fa-shield-halved"></i> Secure &nbsp;·&nbsp;
+        <i class="fa-solid fa-satellite-dish"></i> Live Visibility &nbsp;·&nbsp;
+        <i class="fa-solid fa-globe"></i> International Network
       </p>
-      <div class="hero-floaters">
-        <div class="hero-pill"><i class="fa-solid fa-check-circle" style="color:#22c55e;"></i> 98% On-Time</div>
-        <div class="hero-pill"><i class="fa-solid fa-boxes-stacked" style="color:var(--accent);"></i> 12M+ Packages</div>
-        <div class="hero-pill"><i class="fa-solid fa-map-pin" style="color:#8b5cf6;"></i> 150+ Countries</div>
-        <div class="hero-pill"><i class="fa-solid fa-headset" style="color:#3b82f6;"></i> 24/7 Support</div>
+
+      <div class="hero-floaters reveal delay-4">
+        <div class="hero-pill"><i class="fa-solid fa-circle-check" style="color:#22c55e;"></i> Reliable Delivery</div>
+        <div class="hero-pill"><i class="fa-solid fa-plane" style="color:var(--accent);"></i> Air Freight</div>
+        <div class="hero-pill"><i class="fa-solid fa-ship" style="color:#60a5fa;"></i> Ocean Freight</div>
+        <div class="hero-pill"><i class="fa-solid fa-headset" style="color:#a78bfa;"></i> 24/7 Support</div>
       </div>
     </div>
   </section>
 
-  <!-- Stats -->
-  <div class="stats-strip">
-    <div class="stats-strip-inner">
-      <div><div class="stat-n">12<em>M+</em></div><div class="stat-l">Packages Delivered</div></div>
-      <div><div class="stat-n">98<em>%</em></div><div class="stat-l">On-Time Rate</div></div>
-      <div><div class="stat-n">150<em>+</em></div><div class="stat-l">Countries Served</div></div>
-      <div><div class="stat-n">24<em>/7</em></div><div class="stat-l">Live Support</div></div>
+  <!-- GLOBAL REACH -->
+  <div class="global-strip">
+    <div class="global-strip-inner">
+      <strong><span class="global-dot"></span>Serving businesses across multiple regions</strong>
+      <span>United States</span>
+      <span>Europe</span>
+      <span>North America</span>
+      <span>International Markets</span>
     </div>
   </div>
 
-  <!-- Features -->
-  <section class="features-sec">
+  <!-- ANIMATED STATS -->
+  <div class="stats-strip">
+    <div class="stats-strip-inner">
+      <div class="stat-box">
+        <div class="stat-icon"><i class="fa-solid fa-boxes-stacked"></i></div>
+        <div class="stat-n counter initial-hidden counter-packages"><span class="counter-suffix">M+</span></div>
+        <div class="stat-l">Packages Delivered</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon"><i class="fa-solid fa-chart-line"></i></div>
+        <div class="stat-n counter initial-hidden counter-rate"><span class="counter-suffix">%</span></div>
+        <div class="stat-l">On-Time Delivery Rate</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon"><i class="fa-solid fa-earth-americas"></i></div>
+        <div class="stat-n counter initial-hidden counter-countries"><span class="counter-suffix">+</span></div>
+        <div class="stat-l">Countries Served</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon"><i class="fa-solid fa-calendar-check"></i></div>
+        <div class="stat-n counter initial-hidden counter-years"><span class="counter-suffix">+</span></div>
+        <div class="stat-l">Years of Service</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OPERATIONS SHOWCASE -->
+  <section class="showcase-sec">
+    <div class="showcase-head">
+      <div class="sec-hd">
+        <div class="sec-label">Inside Our Operations</div>
+        <h2>From Warehouse to Worldwide</h2>
+        <p>Every shipment moves through a coordinated logistics process designed for speed, visibility and dependable delivery.</p>
+      </div>
+      <div class="operations-note"><i class="fa-solid fa-camera"></i> Our logistics network</div>
+    </div>
+
+    <div class="showcase-grid">
+      <div class="image-card reveal">
+        <img class="visual-img" src="warehouse.jpg" alt="FirstChoice Logistics warehouse" loading="lazy">
+        <div class="image-caption"><strong>Our Warehouse</strong><span>Organised storage and shipment preparation</span></div>
+      </div>
+      <div class="image-card reveal delay-1">
+        <img class="visual-img" src="logistics-truck.jpg" alt="FirstChoice Logistics delivery truck" loading="lazy">
+        <div class="image-caption"><strong>Ground Transport</strong><span>Moving cargo to the next stage</span></div>
+      </div>
+      <div class="image-card reveal delay-2">
+        <img class="visual-img" src="loading-plane.jpg" alt="Cargo being loaded onto an aircraft" loading="lazy">
+        <div class="image-caption"><strong>Air Cargo</strong><span>Connecting shipments to international routes</span></div>
+      </div>
+      <div class="image-card reveal delay-3">
+        <img class="visual-img" src="about-warehouse.jpg" alt="FirstChoice Logistics facility" loading="lazy">
+        <div class="image-caption"><strong>Global Infrastructure</strong><span>Built to support growing shipment volumes</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY US -->
+  <section class="features-sec" style="padding-top:20px;">
     <div class="sec-hd">
       <div class="sec-label">Why FirstChoiceLogistics</div>
       <h2>Built for Modern Logistics</h2>
-      <p>Everything you need to manage, track, and deliver with total confidence and transparency.</p>
+      <p>Technology and logistics operations working together to give you a clearer, more dependable shipping experience.</p>
     </div>
     <div class="feat-grid">
       <div class="feat-card">
         <div class="feat-icon" style="background:#dbeafe;color:#1d4ed8;"><i class="fa-solid fa-location-dot"></i></div>
         <h3>Real-Time Tracking</h3>
-        <p>Live GPS-simulated position updates with smooth animated map visualization. See exactly where your shipment is, every second.</p>
+        <p>Follow shipment progress with live location visibility and a clear shipment timeline from origin to destination.</p>
       </div>
       <div class="feat-card">
-        <div class="feat-icon" style="background:#dcfce7;color:#15803d;"><i class="fa-solid fa-clock-rotate-left"></i></div>
-        <h3>Smart ETA Engine</h3>
-        <p>Intelligent live countdown with hold/resume support. ETA freezes when on hold and recalculates instantly on resume.</p>
+        <div class="feat-icon" style="background:#dcfce7;color:#15803d;"><i class="fa-solid fa-clock"></i></div>
+        <h3>Smart ETA Visibility</h3>
+        <p>Clear delivery estimates help you plan inventory, customers and operations around your shipments.</p>
       </div>
       <div class="feat-card">
-        <div class="feat-icon" style="background:#fff7ed;color:#c2410c;"><i class="fa-solid fa-timeline"></i></div>
-        <h3>Status Timeline</h3>
-        <p>Complete visual history of every update with timestamps — from pickup to final delivery, nothing is hidden.</p>
+        <div class="feat-icon" style="background:#fff7ed;color:#c2410c;"><i class="fa-solid fa-route"></i></div>
+        <h3>Global Routes</h3>
+        <p>Move cargo across domestic and international routes through air, ocean, ground and fulfillment solutions.</p>
       </div>
       <div class="feat-card">
         <div class="feat-icon" style="background:#ede9fe;color:#7c3aed;"><i class="fa-solid fa-shield-halved"></i></div>
-        <h3>Secure Admin Panel</h3>
-        <p>Firebase-authenticated dashboard with full CRUD control, hold/resume management, and per-shipment status control.</p>
+        <h3>Secure Operations</h3>
+        <p>Shipment information and operational data are managed through secure systems built for logistics workflows.</p>
       </div>
       <div class="feat-card">
-        <div class="feat-icon" style="background:#fdf4ff;color:#a21caf;"><i class="fa-solid fa-map"></i></div>
-        <h3>Interactive Maps</h3>
-        <p>Leaflet.js maps with origin, destination, and animated current-position markers. Route line shows entire journey.</p>
+        <div class="feat-icon" style="background:#fdf4ff;color:#a21caf;"><i class="fa-solid fa-headset"></i></div>
+        <h3>Dedicated Support</h3>
+        <p>Get assistance when you need it, with customer support designed around shipment questions and updates.</p>
       </div>
       <div class="feat-card">
-        <div class="feat-icon" style="background:#f0fdf4;color:#15803d;"><i class="fa-solid fa-database"></i></div>
-        <h3>Cloud Persistence</h3>
-        <p>All data stored in Firebase Firestore. Shipments sync instantly across sessions, devices, and admin accounts.</p>
+        <div class="feat-icon" style="background:#f0fdf4;color:#15803d;"><i class="fa-solid fa-warehouse"></i></div>
+        <h3>Warehousing & Fulfillment</h3>
+        <p>Storage, inventory handling, pick-and-pack and fulfillment services help keep your supply chain moving.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- NETWORK -->
+  <section class="network-sec">
+    <div class="network-inner">
+      <div class="network-content reveal">
+        <div class="sec-label">Our Reach</div>
+        <h2>One Logistics Partner.<br>Multiple Markets.</h2>
+        <p>FirstChoiceLogistics supports shipments moving through the United States, Europe and several other international markets, giving businesses a flexible logistics partner as they expand.</p>
+        <div class="region-chips">
+          <span><i class="fa-solid fa-flag-usa"></i> United States</span>
+          <span><i class="fa-solid fa-earth-europe"></i> Europe</span>
+          <span><i class="fa-solid fa-earth-americas"></i> North America</span>
+          <span><i class="fa-solid fa-globe"></i> International</span>
+        </div>
       </div>
     </div>
   </section>
@@ -1022,10 +1739,10 @@ table {
   <!-- CTA -->
   <div class="cta-strip">
     <h2>Ready to Ship Smarter?</h2>
-    <p>Join thousands of businesses that trust FirstChoiceLogistics for mission-critical logistics.</p>
+    <p>Track an existing shipment or talk to our team about your next logistics requirement.</p>
     <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-      <button class="btn btn-accent btn-xl" onclick="go('contact')">Get Started Today</button>
-      <button class="btn btn-xl" style="background:rgba(255,255,255,.1);color:white;border:1px solid rgba(255,255,255,.2);" onclick="go('services')">View Services</button>
+      <button class="btn btn-accent btn-xl" onclick="go('contact')">Get Started Today <i class="fa-solid fa-arrow-right"></i></button>
+      <button class="btn btn-xl" style="background:rgba(255,255,255,.1);color:white;border:1px solid rgba(255,255,255,.2);" onclick="go('services')">Explore Services</button>
     </div>
   </div>
 </div><!-- end home -->
@@ -1315,101 +2032,56 @@ table {
 <!-- ═══ ABOUT PAGE ═══ -->
 <div id="pg-about" class="page">
   <div class="about-hero">
-    <div class="sec-label" style="background:rgba(249,115,22,.15);color:#fdba74;">Our Story</div>
-    <h1>About FirstChoiceLogistics</h1>
-    <p>Pioneering the future of global logistics through technology, trust, and radical transparency.</p>
+    <div style="width:100%;max-width:1240px;padding:0 28px;">
+      <div class="sec-label" style="background:rgba(249,115,22,.15);color:#fdba74;">Our Story</div>
+      <h1>About FirstChoiceLogistics</h1>
+      <p>Connecting businesses and customers to the world through dependable logistics, modern shipment visibility and a growing international network.</p>
+    </div>
   </div>
+
   <div class="content-wrap">
-    <!-- Story -->
     <div class="story-grid">
       <div>
-        <div class="sec-label">Founded 2015</div>
-        <h2 style="font-family:'Syne',sans-serif;font-size:clamp(26px,3vw,36px);font-weight:800;letter-spacing:-1px;margin:10px 0 18px;">Delivering Trust Since Day One</h2>
-        <p style="color:var(--text-2);line-height:1.8;margin-bottom:14px;">FirstChoiceLogistics was founded on a single belief: logistics should be transparent, reliable, and stress-free for everyone involved — sender, receiver, and operator alike.</p>
-        <p style="color:var(--text-2);line-height:1.8;margin-bottom:14px;">What started as a small regional courier tracker has grown into an enterprise-grade global platform trusted by thousands of businesses across 150+ countries.</p>
-        <p style="color:var(--text-2);line-height:1.8;">Our team of engineers, logistics experts, and customer success specialists work around the clock to ensure every package reaches its destination — on time, every time.</p>
+        <div class="sec-label">Built to Move</div>
+        <h2 style="font-family:'Syne',sans-serif;font-size:clamp(26px,3vw,36px);font-weight:800;letter-spacing:-1px;margin:10px 0 18px;">Logistics That Keeps Business Moving</h2>
+        <p style="color:var(--text-2);line-height:1.8;margin-bottom:14px;">FirstChoiceLogistics was founded around a simple idea: shipping should be clear, reliable and easier to manage. We bring transportation, freight, warehousing and shipment visibility together into one connected experience.</p>
+        <p style="color:var(--text-2);line-height:1.8;margin-bottom:14px;">Our operations support customers across the United States, Europe and other international markets, helping goods move from origin to destination through coordinated logistics solutions.</p>
+        <p style="color:var(--text-2);line-height:1.8;">From the warehouse floor to the final mile, our goal is to provide dependable service, clear communication and visibility throughout the journey.</p>
       </div>
-      <div class="story-img-box">
-        <div style="font-size:72px;margin-bottom:18px;animation:float 3s ease-in-out infinite;">📦</div>
-        <h3>Our Mission</h3>
-        <p>To connect the world through reliable, transparent, and technology-driven logistics that empowers businesses of every size to deliver with confidence.</p>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:24px;">
-          <div style="background:rgba(255,255,255,.08);border-radius:10px;padding:16px;text-align:center;">
-            <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--accent);">12M+</div>
-            <div style="font-size:12px;color:rgba(255,255,255,.6);margin-top:2px;">Deliveries</div>
-          </div>
-          <div style="background:rgba(255,255,255,.08);border-radius:10px;padding:16px;text-align:center;">
-            <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:#22c55e;">98%</div>
-            <div style="font-size:12px;color:rgba(255,255,255,.6);margin-top:2px;">On-Time</div>
-          </div>
+
+      <div class="image-card story-photo reveal">
+        <img class="visual-img" src="about-warehouse.jpg" alt="FirstChoice Logistics warehouse and operations" loading="lazy">
+        <div class="mission-overlay">
+          <div class="sec-label" style="background:rgba(249,115,22,.18);color:#fdba74;">Our Mission</div>
+          <h3>Move Goods. Build Trust.</h3>
+          <p>To make global logistics more connected, transparent and dependable for businesses of every size.</p>
         </div>
       </div>
     </div>
-    <!-- Values -->
+
     <div class="sec-hd">
       <div class="sec-label">Our Values</div>
       <h2>What Drives Us Forward</h2>
-      <p>Three principles guide everything we build and every decision we make.</p>
+      <p>Principles that shape how we serve customers and manage every shipment.</p>
     </div>
+
     <div class="values-grid">
-      <div class="val-card">
-        <div class="val-icon" style="background:#dbeafe;color:#1d4ed8;"><i class="fa-solid fa-eye"></i></div>
-        <h3>Transparency</h3>
-        <p>Every update, every location, every milestone is visible in real time. We believe customers deserve full visibility, not vague promises.</p>
-      </div>
-      <div class="val-card">
-        <div class="val-icon" style="background:#dcfce7;color:#15803d;"><i class="fa-solid fa-bolt"></i></div>
-        <h3>Speed</h3>
-        <p>Optimised routes, proactive management, and intelligent scheduling mean your packages arrive faster — not just on time, but ahead of time.</p>
-      </div>
-      <div class="val-card">
-        <div class="val-icon" style="background:#fff7ed;color:#c2410c;"><i class="fa-solid fa-handshake"></i></div>
-        <h3>Reliability</h3>
-        <p>Our 98% on-time delivery rate is backed by redundant systems, proactive monitoring, and a team that never sleeps when your cargo is in motion.</p>
-      </div>
-      <div class="val-card">
-        <div class="val-icon" style="background:#ede9fe;color:#7c3aed;"><i class="fa-solid fa-leaf"></i></div>
-        <h3>Sustainability</h3>
-        <p>We are committed to carbon-neutral operations by 2027 through optimised routing, electric fleet investment, and offset programs.</p>
-      </div>
+      <div class="val-card"><div class="val-icon" style="background:#dbeafe;color:#1d4ed8;"><i class="fa-solid fa-eye"></i></div><h3>Transparency</h3><p>Clear shipment information and straightforward communication help customers stay informed.</p></div>
+      <div class="val-card"><div class="val-icon" style="background:#dcfce7;color:#15803d;"><i class="fa-solid fa-bolt"></i></div><h3>Speed</h3><p>Efficient routes and coordinated operations help keep time-sensitive shipments moving.</p></div>
+      <div class="val-card"><div class="val-icon" style="background:#fff7ed;color:#c2410c;"><i class="fa-solid fa-handshake"></i></div><h3>Reliability</h3><p>We focus on consistent processes, responsive support and dependable shipment handling.</p></div>
+      <div class="val-card"><div class="val-icon" style="background:#ede9fe;color:#7c3aed;"><i class="fa-solid fa-globe"></i></div><h3>Global Mindset</h3><p>Our growing international reach helps businesses connect with customers and markets beyond borders.</p></div>
     </div>
-    <!-- Team -->
+
     <div class="sec-hd" style="margin-top:20px;">
-      <div class="sec-label">The Team</div>
-      <h2>People Behind FirstChoiceLogistics</h2>
-      <p>Driven by passion for logistics, technology, and customer delight.</p>
+      <div class="sec-label">Our Infrastructure</div>
+      <h2>Where Logistics Happens</h2>
+      <p>A closer look at the facilities and transportation network behind each shipment.</p>
     </div>
-    <div class="team-grid">
-      <div class="team-card">
-        <div class="team-av" style="background:var(--primary);">JD</div>
-        <div class="team-n">James Davidson</div>
-        <div class="team-r">CEO & Co-Founder</div>
-      </div>
-      <div class="team-card">
-        <div class="team-av" style="background:var(--accent);">SM</div>
-        <div class="team-n">Sarah Mitchell</div>
-        <div class="team-r">Chief Operations Officer</div>
-      </div>
-      <div class="team-card">
-        <div class="team-av" style="background:var(--green);">RL</div>
-        <div class="team-n">Ryan Liu</div>
-        <div class="team-r">Head of Technology</div>
-      </div>
-      <div class="team-card">
-        <div class="team-av" style="background:var(--purple);">AP</div>
-        <div class="team-n">Amara Patel</div>
-        <div class="team-r">Head of Logistics</div>
-      </div>
-      <div class="team-card">
-        <div class="team-av" style="background:#0891b2;">TC</div>
-        <div class="team-n">Thomas Chen</div>
-        <div class="team-r">VP of Engineering</div>
-      </div>
-      <div class="team-card">
-        <div class="team-av" style="background:#be185d;">LW</div>
-        <div class="team-n">Layla Williams</div>
-        <div class="team-r">Head of Customer Success</div>
-      </div>
+
+    <div class="showcase-grid" style="grid-template-columns:1fr 1fr 1fr;grid-auto-rows:260px;margin-bottom:70px;">
+      <div class="image-card"><img class="visual-img" src="warehouse.jpg" alt="Logistics warehouse" loading="lazy"><div class="image-caption"><strong>Warehouse Operations</strong><span>Storage and shipment preparation</span></div></div>
+      <div class="image-card"><img class="visual-img" src="logistics-truck.jpg" alt="Logistics truck" loading="lazy"><div class="image-caption"><strong>Ground Network</strong><span>Reliable cargo movement</span></div></div>
+      <div class="image-card"><img class="visual-img" src="loading-plane.jpg" alt="Air cargo loading" loading="lazy"><div class="image-caption"><strong>Air Cargo</strong><span>International freight connections</span></div></div>
     </div>
   </div>
 </div><!-- end about -->
@@ -1419,90 +2091,97 @@ table {
   <div class="services-hero">
     <div class="sec-label" style="background:rgba(249,115,22,.15);color:#fdba74;">What We Offer</div>
     <h1>Logistics Solutions<br>For Every Need</h1>
-    <p>From same-day local delivery to complex international freight — we have the expertise and infrastructure to handle it all.</p>
+    <p>From time-critical delivery to international freight and fulfillment, choose the logistics service that fits your operation.</p>
   </div>
+
   <div class="services-content">
     <div class="sec-hd">
       <div class="sec-label">Our Services</div>
-      <h2>Choose Your Shipping Solution</h2>
-      <p>Every service includes full real-time tracking and dedicated support.</p>
+      <h2>Move Cargo With Confidence</h2>
+      <p>Every service is supported by shipment visibility and dedicated customer support.</p>
     </div>
+
     <div class="srv-grid">
       <div class="srv-card">
-        <div class="srv-icon" style="background:#dbeafe;color:#1d4ed8;"><i class="fa-solid fa-truck-fast"></i></div>
-        <h3>Express Delivery</h3>
-        <p>Same-day and next-day delivery for time-critical shipments. Guaranteed delivery windows with live GPS tracking every step of the way.</p>
-        <div class="srv-tag"><span>Same Day</span><span>Next Day</span><span>Priority</span></div>
+        <div class="srv-image"><img src="service-express.jpg" alt="Express delivery service" loading="lazy"></div>
+        <div class="srv-body">
+          <div class="srv-icon" style="background:#dbeafe;color:#1d4ed8;"><i class="fa-solid fa-truck-fast"></i></div>
+          <h3>Express Delivery</h3>
+          <p>Fast delivery for time-sensitive shipments, with priority handling and shipment tracking from pickup through delivery.</p>
+          <div class="srv-tag"><span>Same Day</span><span>Next Day</span><span>Priority</span></div>
+        </div>
       </div>
+
       <div class="srv-card">
-        <div class="srv-icon" style="background:#dcfce7;color:#15803d;"><i class="fa-solid fa-plane-departure"></i></div>
-        <h3>Air Freight</h3>
-        <p>Fast international shipping via major air cargo networks. Complete customs handling, documentation, and door-to-door delivery included.</p>
-        <div class="srv-tag"><span>International</span><span>Customs Handled</span><span>Door-to-Door</span></div>
+        <div class="srv-image"><img src="service-air-freight.jpg" alt="Air freight cargo" loading="lazy"></div>
+        <div class="srv-body">
+          <div class="srv-icon" style="background:#dcfce7;color:#15803d;"><i class="fa-solid fa-plane-departure"></i></div>
+          <h3>Air Freight</h3>
+          <p>International air cargo solutions for shipments where speed matters, supported by documentation and route coordination.</p>
+          <div class="srv-tag"><span>International</span><span>Air Cargo</span><span>Door-to-Door</span></div>
+        </div>
       </div>
+
       <div class="srv-card">
-        <div class="srv-icon" style="background:#fff7ed;color:#c2410c;"><i class="fa-solid fa-ship"></i></div>
-        <h3>Ocean Freight</h3>
-        <p>Cost-effective bulk shipping via global sea routes. Full container load (FCL) and less-than-container load (LCL) options available.</p>
-        <div class="srv-tag"><span>FCL</span><span>LCL</span><span>Bulk Cargo</span></div>
+        <div class="srv-image"><img src="service-ocean-freight.jpg" alt="Ocean freight containers" loading="lazy"></div>
+        <div class="srv-body">
+          <div class="srv-icon" style="background:#fff7ed;color:#c2410c;"><i class="fa-solid fa-ship"></i></div>
+          <h3>Ocean Freight</h3>
+          <p>Cost-effective international sea freight for larger shipments, including container and consolidated cargo options.</p>
+          <div class="srv-tag"><span>FCL</span><span>LCL</span><span>Bulk Cargo</span></div>
+        </div>
       </div>
+
       <div class="srv-card">
-        <div class="srv-icon" style="background:#ede9fe;color:#7c3aed;"><i class="fa-solid fa-warehouse"></i></div>
-        <h3>Warehousing & Fulfillment</h3>
-        <p>Secure, climate-controlled storage with automated inventory management, pick-and-pack, and same-day fulfillment capabilities.</p>
-        <div class="srv-tag"><span>Climate-Controlled</span><span>Inventory Mgmt</span><span>Pick & Pack</span></div>
+        <div class="srv-image"><img src="service-warehousing.jpg" alt="Warehouse fulfillment operation" loading="lazy"></div>
+        <div class="srv-body">
+          <div class="srv-icon" style="background:#ede9fe;color:#7c3aed;"><i class="fa-solid fa-warehouse"></i></div>
+          <h3>Warehousing & Fulfillment</h3>
+          <p>Secure storage and fulfillment support including inventory handling, pick-and-pack and shipment preparation.</p>
+          <div class="srv-tag"><span>Storage</span><span>Inventory</span><span>Pick & Pack</span></div>
+        </div>
       </div>
+
       <div class="srv-card">
-        <div class="srv-icon" style="background:#fdf4ff;color:#a21caf;"><i class="fa-solid fa-rotate-left"></i></div>
-        <h3>Reverse Logistics</h3>
-        <p>Streamlined returns management with easy scheduling, automated refund processing integration, and real-time return tracking.</p>
-        <div class="srv-tag"><span>Easy Returns</span><span>Refund Integration</span><span>Tracking</span></div>
+        <div class="srv-image"><img src="service-reverse-logistics.jpg" alt="Reverse logistics and returns" loading="lazy"></div>
+        <div class="srv-body">
+          <div class="srv-icon" style="background:#fdf4ff;color:#a21caf;"><i class="fa-solid fa-rotate-left"></i></div>
+          <h3>Reverse Logistics</h3>
+          <p>Structured returns and reverse-shipping workflows designed to help businesses manage products moving back through the network.</p>
+          <div class="srv-tag"><span>Returns</span><span>Tracking</span><span>Recovery</span></div>
+        </div>
       </div>
+
       <div class="srv-card">
-        <div class="srv-icon" style="background:#f0fdf4;color:#15803d;"><i class="fa-solid fa-chart-line"></i></div>
-        <h3>Analytics & Insights</h3>
-        <p>Comprehensive dashboards, delivery performance reports, and supply chain optimization recommendations powered by real logistics data.</p>
-        <div class="srv-tag"><span>Live Dashboards</span><span>Reports</span><span>Optimization</span></div>
+        <div class="srv-image"><img src="service-analytics.jpg" alt="Logistics analytics dashboard" loading="lazy"></div>
+        <div class="srv-body">
+          <div class="srv-icon" style="background:#f0fdf4;color:#15803d;"><i class="fa-solid fa-chart-line"></i></div>
+          <h3>Analytics & Insights</h3>
+          <p>Shipment visibility and operational reporting help businesses understand logistics performance and plan more effectively.</p>
+          <div class="srv-tag"><span>Dashboards</span><span>Reports</span><span>Optimization</span></div>
+        </div>
       </div>
     </div>
 
-    <!-- Process -->
     <div class="process-sec">
       <div class="sec-hd">
         <div class="sec-label">How It Works</div>
-        <h2>Simple, 4-Step Process</h2>
-        <p>From booking to delivery — seamless and fully tracked.</p>
+        <h2>Simple From Pickup to Delivery</h2>
+        <p>A straightforward logistics journey with visibility at every stage.</p>
       </div>
       <div class="process-steps">
-        <div class="proc-step">
-          <div class="proc-num">01</div>
-          <h4>Book Online</h4>
-          <p>Submit your shipment details via our admin portal. Tracking code generated instantly.</p>
-        </div>
-        <div class="proc-step">
-          <div class="proc-num">02</div>
-          <h4>We Collect</h4>
-          <p>Our team picks up your package from the origin address at your scheduled time.</p>
-        </div>
-        <div class="proc-step">
-          <div class="proc-num">03</div>
-          <h4>In Transit</h4>
-          <p>Package moves through our optimised network with real-time location updates.</p>
-        </div>
-        <div class="proc-step">
-          <div class="proc-num">04</div>
-          <h4>Delivered</h4>
-          <p>Safe delivery with digital proof of receipt. Full timeline preserved forever.</p>
-        </div>
+        <div class="proc-step"><div class="proc-num">01</div><h4>Book</h4><p>Provide the shipment details and destination.</p></div>
+        <div class="proc-step"><div class="proc-num">02</div><h4>Collect</h4><p>Our logistics process begins at the origin.</p></div>
+        <div class="proc-step"><div class="proc-num">03</div><h4>Move</h4><p>Cargo travels through the selected logistics network.</p></div>
+        <div class="proc-step"><div class="proc-num">04</div><h4>Deliver</h4><p>Shipment reaches its destination with tracking visibility.</p></div>
       </div>
     </div>
 
-    <!-- CTA -->
     <div class="pricing-cta">
-      <h2>Need a Custom Solution?</h2>
-      <p>Our logistics experts will design a bespoke shipping strategy tailored to your business requirements and volume.</p>
+      <h2>Need a Custom Logistics Solution?</h2>
+      <p>Tell us what you're shipping, where it needs to go and what timeline you're working with.</p>
       <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-        <button class="btn btn-accent btn-xl" onclick="go('contact')">Contact Sales Team</button>
+        <button class="btn btn-accent btn-xl" onclick="go('contact')">Contact Our Team <i class="fa-solid fa-arrow-right"></i></button>
         <button class="btn btn-xl" style="background:rgba(255,255,255,.1);color:white;border:1px solid rgba(255,255,255,.2);" onclick="go('home')">Track a Package</button>
       </div>
     </div>
@@ -1653,6 +2332,7 @@ table {
 <footer>
   <div class="footer-grid">
     <div class="ft-brand">
+      <img class="footer-logo" src="logo.png" alt="FirstChoice Logistics logo">
       <h3>FirstChoice<em>Logistics</em></h3>
       <p>Enterprise logistics tracking platform with real-time GPS simulation, Firebase persistence, smart ETA engine, and full admin control.</p>
     </div>
@@ -1685,7 +2365,7 @@ table {
     </div>
   </div>
   <div class="ft-bottom">
-    <span>© 2025 FirstChoiceLogistics. All rights reserved.</span>
+    <span>© 2026 FirstChoiceLogistics. All rights reserved.</span>
     <span style="color:rgba(255,255,255,.3);">Firebase · Leaflet.js · DM Sans · Syne</span>
   </div>
 </footer>
@@ -2371,6 +3051,22 @@ function toLocal(d){ const o = d.getTimezoneOffset(); return new Date(d.getTime(
   }
   go('home');
 })();
+</script>
+
+<script>
+/*
+  VISUAL-ONLY INITIALIZER
+  This does NOT modify the application's existing JS/data/tracking logic.
+  It only adds a graceful image fallback for missing placeholder files.
+*/
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('img.visual-img, .srv-image img, .footer-logo, .nav-brand-icon img').forEach(function (img) {
+    img.addEventListener('error', function () {
+      this.style.opacity = '0';
+      this.parentElement && this.parentElement.classList.add('image-missing');
+    });
+  });
+});
 </script>
 </body>
 </html>
